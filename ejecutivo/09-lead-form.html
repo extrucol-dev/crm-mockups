@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Ejecutivo · Lead Form</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
+  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
+  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
+  .bp-col { display: flex; flex-direction: column; }
+
+  .form-card { max-width: 672px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); }
+  .form-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+  .form-section:last-child { border-bottom: none; }
+  .form-section__title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .form-section__title .icon { color: var(--primary); }
+  .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .form-grid-full { grid-column: 1 / -1; }
+
+  .interes-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--border-input);
+    background: var(--surface); font-size: 12.5px;
+    font-weight: 600; color: var(--text-secondary);
+    cursor: pointer; transition: all 180ms;
+  }
+  .interes-chip:hover { border-color: var(--primary); }
+  .interes-chip.is-selected { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
+  .interes-chip.is-selected::before { content: '✓'; font-weight: 700; }
+
+  .origen-option {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 10px; border-radius: 8px;
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all 180ms; text-align: center;
+  }
+  .origen-option:hover { border-color: var(--primary); background: var(--primary-bg); }
+  .origen-option.is-selected { border-color: var(--primary); background: var(--primary-bg); }
+  .origen-option__icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--page-bg); color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .origen-option.is-selected .origen-option__icon { background: var(--primary); color: #fff; }
+  .origen-option__label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
+  .origen-option.is-selected .origen-option__label { color: var(--primary); }
+</style>
+</head>
+<body>
+<div class="mockup-scroll">
+  <div class="mockup-scroll__inner">
+
+    <div style="margin-bottom: 40px;">
+      <div class="canvas-title">👔 EJECUTIVO — Formulario Nuevo Lead</div>
+      <div class="canvas-subtitle">
+        Captura de lead con origen visual y selección múltiple de intereses.
+        DB: <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_LEAD + CRM_LEAD_INTERES + CRM_ORIGEN_LEAD</code>
+      </div>
+    </div>
+
+    <div class="breakpoints-row">
+      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d"></div></div></div>
+      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t"></div></div></div>
+      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/components.js"></script>
+<script>
+function content(bp) {
+  const isMobile = bp === 'mobile';
+  const gridCols = isMobile ? '1fr' : 'repeat(2, 1fr)';
+
+  const origenes = [
+    { icon: 'globe', label: 'Página Web', sel: true },
+    { icon: 'phone', label: 'Llamada' },
+    { icon: 'envelope', label: 'Email' },
+    { icon: 'users', label: 'Referido' },
+    { icon: 'chartBar', label: 'Facebook' },
+    { icon: 'sparkles', label: 'Instagram' },
+    { icon: 'clipboard', label: 'WhatsApp' },
+    { icon: 'briefcase', label: 'Licitación' },
+  ];
+
+  const intereses = [
+    { label: 'Tubería PE100', sel: true },
+    { label: 'Sistema de riego', sel: true },
+    { label: 'Accesorios PE' },
+    { label: 'Asesoría técnica', sel: false },
+    { label: 'Válvulas y fittings' },
+    { label: 'Tubería CPVC' },
+    { label: 'Instalación' },
+    { label: 'Mantenimiento' },
+  ];
+
+  return `
+    <div class="content">
+      ${!isMobile ? `
+        <div class="page-head">
+          <div class="page-head__title-group">
+            <div class="page-head__title">Nuevo Lead</div>
+            <div class="page-head__subtitle">Registra un prospecto y sus intereses comerciales</div>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="form-card">
+        <div class="form-section">
+          <div class="form-section__title">${Icons.funnel} Información básica</div>
+          <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
+            <div class="form-field form-grid-full">
+              <label class="form-field__label">Título del lead <span class="req">*</span></label>
+              <input class="input" value="Consulta portafolio sistema de riego" />
+              <span class="form-field__hint">Un resumen breve de la necesidad del prospecto</span>
+            </div>
+            <div class="form-field form-grid-full">
+              <label class="form-field__label">Descripción</label>
+              <textarea class="textarea" rows="3">Cliente interesado en conocer opciones de riego por goteo para cultivo de 30 hectáreas. Solicita visita técnica y cotización preliminar.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section__title">${Icons.globe} Origen del lead</div>
+          <div style="display: grid; grid-template-columns: repeat(${isMobile ? 2 : 4}, 1fr); gap: 8px;">
+            ${origenes.map(o => `
+              <div class="origen-option ${o.sel ? 'is-selected' : ''}">
+                <div class="origen-option__icon">${Icons[o.icon]}</div>
+                <div class="origen-option__label">${o.label}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section__title">${Icons.building} Empresa y contacto</div>
+          <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
+            <div class="form-field">
+              <label class="form-field__label">Empresa</label>
+              <div class="input-wrapper">
+                ${Icons.search}
+                <input class="input input--with-icon" value="Agroindustria Llanera" />
+              </div>
+              <span class="form-field__hint">Opcional · si ya existe</span>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Contacto</label>
+              <div class="input-wrapper">
+                ${Icons.search}
+                <input class="input input--with-icon" placeholder="Buscar o crear contacto" />
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Email del contacto</label>
+              <input class="input" type="email" placeholder="cliente@empresa.com" value="contacto@agrollanera.co" />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Teléfono</label>
+              <input class="input" placeholder="+57 300 000 0000" value="+57 315 678 9012" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section__title">${Icons.tag} Intereses</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Selecciona todos los productos o servicios de interés del lead</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${intereses.map(i => `
+              <span class="interes-chip ${i.sel ? 'is-selected' : ''}">${i.label}</span>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="form-section" style="background: var(--page-bg);">
+          <div class="form-actions" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <button class="btn btn--secondary">Cancelar</button>
+            <button class="btn btn--primary">${Icons.check} Guardar lead</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('d').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Nuevo']})}${content('desktop')}</div>`;
+document.getElementById('t').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Nuevo']})}${content('tablet')}</div>`;
+document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Nuevo Lead', actions:`<button class="topbar__icon-btn">${Icons.close}</button>`})}${content('mobile')}</div>`;
+</script>
+</body>
+</html>

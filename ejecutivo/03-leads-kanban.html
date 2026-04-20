@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Ejecutivo · Leads Kanban</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
+  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
+  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
+  .bp-col { display: flex; flex-direction: column; }
+  .kanban-mobile-tabs {
+    display: flex; gap: 6px; overflow-x: auto; padding: 8px 0;
+    margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none;
+  }
+  .kanban-mobile-tabs::-webkit-scrollbar { display: none; }
+  .kanban-mobile-tab {
+    padding: 8px 14px; border-radius: 999px; background: var(--surface);
+    border: 1px solid var(--border); font-size: 12.5px; font-weight: 600;
+    color: var(--text-secondary); white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .kanban-mobile-tab.is-active {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+  .kanban-mobile-tab .dot { width: 6px; height: 6px; border-radius: 999px; }
+
+  .lead-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    transition: all 180ms ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lead-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+  .lead-card__origen {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted);
+  }
+  .lead-card__title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .lead-card__empresa { font-size: 11.5px; color: var(--text-muted); }
+  .lead-card__intereses { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .lead-card__interes-chip {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--primary-bg); color: var(--primary);
+  }
+  .lead-card__footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 8px; border-top: 1px solid var(--border); margin-top: 2px;
+  }
+  .lead-card__score {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 700; color: var(--accent);
+  }
+  .lead-card__age { font-size: 10.5px; color: var(--text-disabled); }
+</style>
+</head>
+<body>
+<div>
+  <div >
+
+    <div >
+      <div >
+        <div ><div class="app-shell" id="desktop-shell"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="../shared/components.js"></script>
+<script>
+const leadsData = {
+  NUEVO: { color: '#3B82F6', label: 'Nuevo', badgeClass: 'prospecto', items: [
+    { titulo: 'Consulta portafolio riego', empresa: 'Agroindustria Llanera', origen: 'Página Web', intereses: ['Riego', 'Asesoría'], score: 65, age: '2d', avatar: 'AL', color: 3 },
+    { titulo: 'Solicita cotización PE100', empresa: 'Constructora XYZ', origen: 'WhatsApp', intereses: ['Tubería PE'], score: 48, age: '1d', avatar: 'CX', color: 5 },
+    { titulo: 'Interesado en accesorios', empresa: 'Distribuidora del Sur', origen: 'Facebook', intereses: ['Accesorios'], score: 52, age: '3h', avatar: 'DS', color: 4 },
+  ]},
+  CONTACTADO: { color: '#A855F7', label: 'Contactado', badgeClass: 'propuesta', items: [
+    { titulo: 'Proyecto acueducto municipal', empresa: 'Alcaldía de Piedecuesta', origen: 'Referido', intereses: ['Tubería PE', 'Asesoría'], score: 78, age: '5d', avatar: 'AP', color: 1 },
+    { titulo: 'Ampliación red residencial', empresa: 'Urbanizadora Andina', origen: 'Instagram', intereses: ['Tubería PE'], score: 68, age: '4d', avatar: 'UA', color: 6 },
+    { titulo: 'Sistema riego invernadero', empresa: 'Floricultura San José', origen: 'Página Web', intereses: ['Riego'], score: 72, age: '3d', avatar: 'FS', color: 3 },
+  ]},
+  INTERESADO: { color: '#F39610', label: 'Interesado', badgeClass: 'calificacion', items: [
+    { titulo: 'Suministro anual de tubería', empresa: 'Constructora Bolívar', origen: 'Referido', intereses: ['Tubería PE', 'Accesorios'], score: 86, age: '7d', avatar: 'CB', color: 2 },
+    { titulo: 'Red matriz barrio nuevo', empresa: 'Servientrega Colombia', origen: 'Llamada', intereses: ['Tubería PE'], score: 82, age: '6d', avatar: 'SC', color: 4 },
+  ]},
+  CALIFICADO: { color: '#22C55E', label: 'Calificado', badgeClass: 'ganada', items: [
+    { titulo: 'Proyecto acueducto rural', empresa: 'EMPAS S.A.', origen: 'Licitación', intereses: ['Tubería PE', 'Asesoría'], score: 92, age: '10d', avatar: 'ES', color: 1 },
+  ]},
+  DESCALIFICADO: { color: '#EF4444', label: 'No Interesado', badgeClass: 'perdida', items: [
+    { titulo: 'Cotización menor', empresa: 'Ferretería Central', origen: 'WhatsApp', intereses: ['Accesorios'], score: 25, age: '8d', avatar: 'FC', color: 5 },
+  ]}
+};
+
+function renderLeadCard(l, estadoKey) {
+  const s = leadsData[estadoKey];
+  return `
+    <div class="lead-card">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span class="lead-card__origen">${Icons.globe} ${l.origen}</span>
+        <button class="topbar__icon-btn" style="width:24px; height:24px;">${Icons.dots}</button>
+      </div>
+      <div class="lead-card__title">${l.titulo}</div>
+      <div class="lead-card__empresa">${l.empresa}</div>
+      <div class="lead-card__intereses">
+        ${l.intereses.map(i => `<span class="lead-card__interes-chip">${i}</span>`).join('')}
+      </div>
+      <div class="lead-card__footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="avatar avatar--xs avatar--color-${l.color}">${l.avatar}</div>
+          <span class="lead-card__score">${Icons.fire} ${l.score}</span>
+        </div>
+        <span class="lead-card__age">${l.age}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderKanbanColumn(estadoKey) {
+  const col = leadsData[estadoKey];
+  const cards = col.items.map(l => renderLeadCard(l, estadoKey)).join('');
+  return `
+    <div class="kanban-col">
+      <div class="kanban-col__header">
+        <span class="kanban-col__dot" style="background:${col.color}"></span>
+        <span class="kanban-col__label">${col.label}</span>
+        <span class="kanban-col__count">${col.items.length}</span>
+      </div>
+      <div class="kanban-col__line" style="background:${col.color}"></div>
+      <div class="kanban-col__list">
+        ${cards || `<div class="kanban-col__empty">Sin leads</div>`}
+      </div>
+    </div>
+  `;
+}
+
+function content(bp) {
+  if (bp === 'mobile') {
+    const active = 'INTERESADO';
+    return `
+      <div class="content" style="padding-top: 0;">
+        <div class="kanban-mobile-tabs">
+          ${Object.keys(leadsData).map(k => `
+            <div class="kanban-mobile-tab ${k === active ? 'is-active' : ''}">
+              <span class="dot" style="background:${leadsData[k].color}"></span>
+              ${leadsData[k].label}
+              <span style="opacity:.75;">${leadsData[k].items.length}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="padding: 16px 0;">
+          <div class="kanban-col__list" style="gap: 10px;">
+            ${leadsData[active].items.map(l => renderLeadCard(l, active)).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const total = Object.values(leadsData).reduce((a,b)=>a+b.items.length, 0);
+  const columnasKanban = bp === 'tablet'
+    ? `<div class="kanban" style="grid-template-columns: repeat(2, 1fr);">
+         ${renderKanbanColumn('NUEVO')}
+         ${renderKanbanColumn('CONTACTADO')}
+         ${renderKanbanColumn('INTERESADO')}
+         ${renderKanbanColumn('CALIFICADO')}
+       </div>`
+    : `<div class="kanban" style="grid-template-columns: repeat(5, 1fr);">
+         ${renderKanbanColumn('NUEVO')}
+         ${renderKanbanColumn('CONTACTADO')}
+         ${renderKanbanColumn('INTERESADO')}
+         ${renderKanbanColumn('CALIFICADO')}
+         ${renderKanbanColumn('DESCALIFICADO')}
+       </div>`;
+
+  return `
+    <div class="content">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Mis Leads</div>
+          <div class="page-head__subtitle">${total} leads en seguimiento · 3 sin contactar hace +2 días</div>
+        </div>
+        <div class="page-head__actions">
+          <button class="btn btn--secondary btn--sm">${Icons.filter} Filtros</button>
+          <button class="btn btn--primary btn--sm">${Icons.plus} Nuevo lead</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="input-wrapper" style="flex:1; max-width: 320px;">
+          ${Icons.search}
+          <input class="input input--with-icon" placeholder="Buscar por título, empresa, origen...">
+        </div>
+        <select class="select" style="max-width: 180px;">
+          <option>Todos los orígenes</option>
+          <option>Página Web</option>
+          <option>Facebook</option>
+          <option>WhatsApp</option>
+          <option>Referido</option>
+        </select>
+        <select class="select" style="max-width: 180px;">
+          <option>Todos los intereses</option>
+          <option>Tubería PE</option>
+          <option>Riego</option>
+          <option>Accesorios</option>
+        </select>
+      </div>
+
+      <!-- Alerta de leads estancados -->
+      <div class="alert alert--warning" style="margin-bottom: 16px;">
+        ${Icons.warning}
+        <div>
+          <strong>2 leads estancados.</strong> Tienes leads en estado "Nuevo" sin contactar hace más de 2 días.
+          El sistema enviará notificación al coordinador si superan 3 días.
+        </div>
+      </div>
+
+      ${columnasKanban}
+    </div>
+  `;
+}
+
+document.getElementById('desktop-shell').innerHTML = `
+  ${renderSidebar('leads', 'ejecutivo')}
+  <div class="main-area">${renderTopbar({ title: 'Mis Leads' })}${content('desktop')}</div>
+`;
+document.getElementById('tablet-shell').innerHTML = `
+  ${renderSidebar('leads', 'ejecutivo')}
+  <div class="main-area">${renderTopbar({ title: 'Leads' })}${content('tablet')}</div>
+`;
+document.getElementById('mobile-shell').innerHTML = `
+  <div class="main-area">
+    ${renderTopbar({ title: 'Leads', actions: `<button class="topbar__icon-btn">${Icons.filter}</button><button class="topbar__icon-btn">${Icons.plus}</button>` })}
+    ${content('mobile')}
+    ${renderMobileBottomNav('leads')}
+  </div>
+`;
+</script>
+</body>
+</html>

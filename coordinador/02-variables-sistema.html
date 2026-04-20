@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Coordinador · Variables del Sistema</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
+  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
+  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
+  .bp-col { display: flex; flex-direction: column; }
+
+  .variables-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .variables-group__header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+  }
+  .variables-group__icon {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .variables-group__icon--error { background: #FDECEA; color: var(--error); }
+  .variables-group__icon--accent { background: var(--accent-bg); color: var(--accent); }
+  .variables-group__icon--success { background: #E8F5EE; color: var(--success); }
+  .variable-row {
+    display: grid;
+    grid-template-columns: 1fr 180px 100px 44px;
+    gap: 16px; align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .variable-row:last-child { border-bottom: none; }
+  .variable-row:hover { background: var(--page-bg); }
+  .variable-name {
+    font-weight: 600; font-size: 13.5px; color: var(--text-primary);
+  }
+  .variable-desc {
+    font-size: 12px; color: var(--text-muted); margin-top: 2px;
+  }
+  .variable-key {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    background: var(--page-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    display: inline-block;
+    margin-top: 4px;
+  }
+  .variable-value-input {
+    text-align: right;
+    font-weight: 700 !important;
+    color: var(--primary) !important;
+  }
+</style>
+</head>
+<body>
+<div>
+  <div>
+
+    <div>
+      <div><div><div class="app-shell" id="d"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/components.js"></script>
+<script>
+const grupos = [
+  {
+    title: 'Alertas y notificaciones',
+    desc: 'Configura los umbrales de tiempo para generar alertas automáticas',
+    icon: 'bell', iconClass: 'error',
+    vars: [
+      { name: 'Días alerta lead sin contactar', desc: 'Tiempo máximo antes de notificar al coordinador', key: 'dias_alerta_lead_sin_contactar', value: '3', unit: 'días' },
+      { name: 'Días alerta oportunidad estancada', desc: 'Sin actividad en el estado actual', key: 'dias_alerta_opp_estancada', value: '7', unit: 'días' },
+      { name: 'Días crítico sin actividad', desc: 'Escalamiento automático al director', key: 'dias_critico_sin_actividad', value: '14', unit: 'días' },
+      { name: 'Hora de envío de reportes diarios', desc: 'Resumen diario enviado a ejecutivos', key: 'hora_reporte_diario', value: '18:00', unit: 'hh:mm' },
+    ]
+  },
+  {
+    title: 'Reglas comerciales',
+    desc: 'Parámetros de clasificación y cálculo del pipeline',
+    icon: 'currency', iconClass: 'accent',
+    vars: [
+      { name: 'Monto mínimo cliente nuevo', desc: 'Valor mínimo para marcar empresa como "nuevo"', key: 'monto_minimo_cliente_nuevo', value: '50.000.000', unit: 'COP' },
+      { name: 'Probabilidad mínima forecast', desc: 'Umbral para incluir en proyección de ventas', key: 'probabilidad_minima_forecast', value: '50', unit: '%' },
+      { name: 'Meta actividades por semana', desc: 'Objetivo de actividades por ejecutivo', key: 'meta_actividades_semana', value: '20', unit: 'actividades' },
+      { name: 'Meta oportunidades abiertas', desc: 'Cantidad mínima por ejecutivo', key: 'meta_opp_abiertas', value: '10', unit: 'opp' },
+    ]
+  },
+  {
+    title: 'Seguridad y auditoría',
+    desc: 'Controles de trazabilidad y acceso al sistema',
+    icon: 'shieldCheck', iconClass: 'success',
+    vars: [
+      { name: 'Auditoría habilitada', desc: 'Registrar todos los cambios críticos', key: 'auditoria_habilitada', value: 'true', unit: 'toggle' },
+      { name: 'Tiempo sesión máxima', desc: 'Cierre automático de sesión inactiva', key: 'tiempo_sesion_maxima', value: '60', unit: 'min' },
+      { name: 'Intentos login máximos', desc: 'Antes de bloquear cuenta', key: 'intentos_login_max', value: '5', unit: 'intentos' },
+    ]
+  },
+  {
+    title: 'Geolocalización',
+    desc: 'Validación de ubicación en actividades de campo',
+    icon: 'gps', iconClass: '',
+    vars: [
+      { name: 'GPS obligatorio en visitas', desc: 'Requerir captura de ubicación', key: 'gps_obligatorio_visitas', value: 'true', unit: 'toggle' },
+      { name: 'Precisión mínima GPS', desc: 'Radio máximo aceptable', key: 'precision_minima_gps', value: '50', unit: 'metros' },
+      { name: 'Validar cercanía a cliente', desc: 'Verificar que la visita esté cerca del domicilio registrado', key: 'validar_cercania_cliente', value: 'false', unit: 'toggle' },
+    ]
+  },
+];
+
+function renderVarRow(v, bp) {
+  const isToggle = v.unit === 'toggle';
+  if (bp === 'mobile') {
+    return `
+      <div style="padding: 14px 16px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px;">
+          <div style="flex:1;">
+            <div class="variable-name">${v.name}</div>
+            <div class="variable-desc">${v.desc}</div>
+          </div>
+          ${isToggle ? `
+            <label class="switch"><input type="checkbox" ${v.value === 'true' ? 'checked' : ''}><span class="switch__slider"></span></label>
+          ` : ''}
+        </div>
+        ${!isToggle ? `
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+            <input class="input variable-value-input" value="${v.value}" style="flex:1;" />
+            <span style="font-size: 11.5px; color: var(--text-muted); min-width: 60px;">${v.unit}</span>
+          </div>
+        ` : ''}
+        <span class="variable-key">${v.key}</span>
+      </div>
+    `;
+  }
+  return `
+    <div class="variable-row">
+      <div>
+        <div class="variable-name">${v.name}</div>
+        <div class="variable-desc">${v.desc}</div>
+        <span class="variable-key">${v.key}</span>
+      </div>
+      ${isToggle ? `
+        <div style="display: flex; justify-content: center;">
+          <label class="switch"><input type="checkbox" ${v.value === 'true' ? 'checked' : ''}><span class="switch__slider"></span></label>
+        </div>
+      ` : `
+        <input class="input variable-value-input" value="${v.value}" />
+      `}
+      <span style="font-size: 11.5px; color: var(--text-muted); text-align: center;">${v.unit}</span>
+      <button class="topbar__icon-btn" title="Historial">${Icons.clock}</button>
+    </div>
+  `;
+}
+
+function renderGrupo(g, bp) {
+  return `
+    <div class="variables-group">
+      <div class="variables-group__header">
+        <div class="variables-group__icon variables-group__icon--${g.iconClass}">${Icons[g.icon]}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size: 14.5px; color: var(--text-primary);">${g.title}</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${g.desc}</div>
+        </div>
+        <span class="badge badge--neutral">${g.vars.length} variables</span>
+      </div>
+      ${g.vars.map(v => renderVarRow(v, bp)).join('')}
+    </div>
+  `;
+}
+
+function content(bp) {
+  const isMobile = bp === 'mobile';
+  return `
+    <div class="content">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Variables del sistema</div>
+          <div class="page-head__subtitle">14 variables organizadas en 4 categorías · Última actualización: hace 2 días</div>
+        </div>
+        ${!isMobile ? `
+          <div class="page-head__actions">
+            <button class="btn btn--secondary btn--sm">${Icons.clock} Historial de cambios</button>
+            <button class="btn btn--secondary btn--sm">${Icons.download} Exportar</button>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Alerta de advertencia -->
+      <div class="alert alert--warning" style="margin-bottom: 20px;">
+        ${Icons.warning}
+        <div>
+          <strong>Cambios con impacto operacional.</strong> Las variables afectan el funcionamiento del sistema en tiempo real.
+          Los cambios quedan registrados en auditoría con fecha, usuario y valores anterior/nuevo.
+        </div>
+      </div>
+
+      ${!isMobile ? `
+        <div class="filter-bar">
+          <div class="input-wrapper" style="flex:1; max-width: 340px;">
+            ${Icons.search}
+            <input class="input input--with-icon" placeholder="Buscar variable por nombre o clave...">
+          </div>
+          <select class="select" style="max-width: 220px;">
+            <option>Todas las categorías</option>
+            <option>Alertas y notificaciones</option>
+            <option>Reglas comerciales</option>
+            <option>Seguridad y auditoría</option>
+            <option>Geolocalización</option>
+          </select>
+          <div style="margin-left: auto; display: flex; gap: 8px;">
+            <button class="btn btn--secondary btn--sm">Restaurar valores por defecto</button>
+            <button class="btn btn--primary btn--sm">${Icons.check} Guardar cambios</button>
+          </div>
+        </div>
+      ` : ''}
+
+      ${grupos.map(g => renderGrupo(g, bp)).join('')}
+
+      ${isMobile ? `
+        <div style="position: sticky; bottom: 0; padding: 12px 0; background: var(--page-bg); display: flex; gap: 10px; margin-top: 20px;">
+          <button class="btn btn--secondary btn--block">Cancelar</button>
+          <button class="btn btn--primary btn--block">Guardar</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+document.getElementById('d').innerHTML = `${renderSidebar('variables','coordinador')}<div class="main-area">${renderTopbar({title:'Variables del sistema'})}${content('desktop')}</div>`;
+document.getElementById('t').innerHTML = `${renderSidebar('variables','coordinador')}<div class="main-area">${renderTopbar({title:'Variables'})}${content('tablet')}</div>`;
+document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Variables', actions:`<button class="topbar__icon-btn">${Icons.clock}</button>`})}${content('mobile')}</div>`;
+</script>
+</body>
+</html>
