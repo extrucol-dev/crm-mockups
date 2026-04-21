@@ -54,29 +54,12 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
+<div>
+  <div>
 
-    <div style="margin-bottom: 40px;">
-      <div class="canvas-title">👔 EJECUTIVO COMERCIAL — Detalle de Oportunidad</div>
-      <div class="canvas-subtitle">
-        Vista 360° de una oportunidad: datos, productos asociados, actividades realizadas, historial de cambios de estado.
-        DB: <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_OPORTUNIDAD + CRM_OPORTUNIDAD_PRODUCTO + CRM_ACTIVIDAD + CRM_HISTORIAL_ESTADO</code>
-      </div>
-    </div>
-
-    <div class="breakpoints-row">
-      <div class="bp-col">
-        <div class="artboard-label">Desktop · 1440 × 900</div>
-        <div class="artboard artboard--desktop"><div class="app-shell" id="desktop-shell"></div></div>
-      </div>
-      <div class="bp-col">
-        <div class="artboard-label">Tablet · 768 × 1024</div>
-        <div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="tablet-shell"></div></div>
-      </div>
-      <div class="bp-col">
-        <div class="artboard-label">Mobile · 375 × 812</div>
-        <div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="mobile-shell"></div></div>
+    <div>
+      <div>
+        <div><div class="app-shell" id="desktop-shell"></div></div>
       </div>
     </div>
 
@@ -209,7 +192,10 @@ function content(bp) {
         ${bp !== 'mobile' ? `
           <div style="display: flex; gap: 8px; flex-shrink: 0;">
             <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
-            <button class="btn btn--secondary btn--sm">${Icons.plus} Actividad</button>
+            <a href="13-actividad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--secondary btn--sm">${Icons.plus} Actividad</button>
+            </a>
+            
             <button class="btn btn--primary btn--sm">${Icons.arrowRight} Avanzar estado</button>
           </div>
         ` : `<button class="topbar__icon-btn">${Icons.dots}</button>`}
@@ -295,7 +281,10 @@ function content(bp) {
       <div class="card">
         <div class="card__header">
           <div class="card__title">Empresa</div>
-          <button class="btn btn--ghost btn--sm">${Icons.view}</button>
+                    <a href="14-cliente-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+                      <button class="btn btn--ghost btn--sm">${Icons.view}</button>
+          </a>
+
         </div>
         <div class="card__body">
           <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
@@ -344,9 +333,13 @@ function content(bp) {
           <div class="card__title">Cierre de oportunidad</div>
         </div>
         <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
-          <button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.check} Marcar como Ganada</button>
-          <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Marcar como Perdida</button>
-        </div>
+          <a href="11-cierre-oportunidad-ganada.html" style="text-decoration: none; color: inherit;">
+            <button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.check} Marcar como Ganada</button>
+          </a>
+          <a href="17-cierre-oportunidad-perdida.html" style="text-decoration: none; color: inherit;">
+            <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Marcar como Perdida</button>
+          </a>
+          </div>
       </div>
     </div>
   `;

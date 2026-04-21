@@ -50,21 +50,10 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-
-    <div style="margin-bottom: 40px;">
-      <div class="canvas-title">👔 EJECUTIVO — Formulario Nuevo Lead</div>
-      <div class="canvas-subtitle">
-        Captura de lead con origen visual y selección múltiple de intereses.
-        DB: <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_LEAD + CRM_LEAD_INTERES + CRM_ORIGEN_LEAD</code>
-      </div>
-    </div>
-
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m"></div></div></div>
+<div>
+  <div>
+    <div>
+      <div><div><div class="app-shell" id="d"></div></div></div>
     </div>
   </div>
 </div>
@@ -99,15 +88,13 @@ function content(bp) {
 
   return `
     <div class="content">
-      ${!isMobile ? `
+
         <div class="page-head">
           <div class="page-head__title-group">
             <div class="page-head__title">Nuevo Lead</div>
             <div class="page-head__subtitle">Registra un prospecto y sus intereses comerciales</div>
           </div>
         </div>
-      ` : ''}
-
       <div class="form-card">
         <div class="form-section">
           <div class="form-section__title">${Icons.funnel} Información básica</div>
@@ -187,8 +174,6 @@ function content(bp) {
 }
 
 document.getElementById('d').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Nuevo']})}${content('desktop')}</div>`;
-document.getElementById('t').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Nuevo']})}${content('tablet')}</div>`;
-document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Nuevo Lead', actions:`<button class="topbar__icon-btn">${Icons.close}</button>`})}${content('mobile')}</div>`;
 </script>
 </body>
 </html>

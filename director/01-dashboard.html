@@ -47,20 +47,12 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-    <div style="margin-bottom: 40px;">
-      <div class="canvas-title">📊 DIRECTOR COMERCIAL — Dashboard Ejecutivo</div>
-      <div class="canvas-subtitle">
-        Vista estratégica del negocio. KPIs globales, pipeline, forecasting, rendimiento por ejecutivo.
-        DB: Consultas agregadas sobre <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_OPORTUNIDAD + CRM_LEAD + CRM_ACTIVIDAD + CRM_USUARIO</code>
-      </div>
-    </div>
+<div>
+  <div>
 
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m"></div></div></div>
+
+    <div>
+      <div><div><div class="app-shell" id="d"></div></div></div>
     </div>
   </div>
 </div>
@@ -211,7 +203,8 @@ function content(bp) {
               <option>Abril 2026</option><option>Marzo 2026</option><option>Q1 2026</option><option>Año 2026</option>
             </select>
             <button class="btn btn--secondary btn--sm">${Icons.download} Exportar PDF</button>
-            <button class="btn btn--primary btn--sm">${Icons.chartBar} Reportes</button>
+            <a href="06-reportes.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;"><button class="btn btn--primary btn--sm">${Icons.chartBar} Reportes</button></a>
+            
           </div>
         ` : ''}
       </div>

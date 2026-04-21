@@ -94,107 +94,17 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-
-    <div style="margin-bottom: 20px;">
-      <div class="canvas-title">👔 EJECUTIVO — Modales de Cierre de Oportunidad</div>
-      <div class="canvas-subtitle">
-        Dos flujos críticos: marcar oportunidad como <strong>Ganada</strong> (opción de crear proyecto) o como <strong>Perdida</strong> (con motivo obligatorio).
-        DB: <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_OPORTUNIDAD + CRM_MOTIVO_CIERRE + CRM_PROYECTO</code>
-      </div>
-    </div>
-
-    <div class="canvas-section-title">🏆 Vista 1 — Cierre GANADA</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop" style="height: 900px; position: relative;" id="won-d"></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile" style="height: 812px; position: relative;" id="won-m"></div></div>
-    </div>
-
-    <div class="canvas-section-title">❌ Vista 2 — Cierre PERDIDA</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop" style="height: 900px; position: relative;" id="lost-d"></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile" style="height: 812px; position: relative;" id="lost-m"></div></div>
+<div>
+  <div>
+    
+    <div>
+      <div><div style="height: 1000px; position: relative;" id="lost-d"></div></div>
     </div>
   </div>
 </div>
 
 <script src="../shared/components.js"></script>
 <script>
-function wonModal() {
-  return `
-    ${renderSidebar('oportunidades','ejecutivo')}
-    <div class="main-area">
-      ${renderTopbar({breadcrumb:['Oportunidades','Detalle']})}
-      <div class="content"></div>
-    </div>
-    <div class="confetti"></div>
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-header__icon--success">${Icons.trophy}</div>
-          <div>
-            <div style="font-weight: 700; font-size: 18px;">¡Oportunidad ganada! 🎉</div>
-            <div style="font-size: 12.5px; color: var(--text-muted);">Registra los detalles del cierre</div>
-          </div>
-        </div>
-        <div class="modal-body">
-          <div style="padding: 14px; background: var(--success-bg); border-radius: 8px; margin-bottom: 16px;">
-            <div style="font-size: 11.5px; color: var(--success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Oportunidad</div>
-            <div style="font-weight: 700; color: var(--text-primary);">Proyecto acueducto rural - Piedecuesta</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">EMPAS S.A. · Valor: $ 485.000.000</div>
-          </div>
-
-          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">Motivo del cierre</div>
-          <div class="motivo-option is-selected--success">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Adjudicación directa</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Cliente seleccionó a Extrucol como proveedor</div>
-            </div>
-          </div>
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Licitación ganada</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Proceso competitivo favorable</div>
-            </div>
-          </div>
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Mejor precio</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Cliente eligió por precio competitivo</div>
-            </div>
-          </div>
-
-          <div class="form-field" style="margin: 16px 0;">
-            <label class="form-field__label">Valor final del cierre (COP)</label>
-            <input class="input" value="$ 485.000.000" />
-          </div>
-
-          <div class="form-field" style="margin-bottom: 16px;">
-            <label class="form-field__label">Observaciones</label>
-            <textarea class="textarea" rows="2" placeholder="Detalles adicionales del cierre..."></textarea>
-          </div>
-
-          <label style="display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--primary-bg); border-radius: 8px; border: 1px solid #c5cfed; cursor: pointer;">
-            <input type="checkbox" checked style="accent-color: var(--primary);" />
-            <div>
-              <div style="font-weight: 600; font-size: 13px; color: var(--primary);">Crear proyecto automáticamente</div>
-              <div style="font-size: 11.5px; color: var(--primary); opacity: 0.8;">Se generará un proyecto vinculado a esta oportunidad</div>
-            </div>
-          </label>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn--secondary">Cancelar</button>
-          <button class="btn btn--primary" style="background: var(--success);">${Icons.check} Confirmar cierre</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 function lostModal() {
   return `
     ${renderSidebar('oportunidades','ejecutivo')}
@@ -275,8 +185,7 @@ function lostModal() {
   `;
 }
 
-document.getElementById('won-d').innerHTML = `<div class="app-shell">${wonModal()}</div>`;
-document.getElementById('won-m').innerHTML = `<div class="app-shell is-mobile">${wonModal()}</div>`;
+
 document.getElementById('lost-d').innerHTML = `<div class="app-shell">${lostModal()}</div>`;
 document.getElementById('lost-m').innerHTML = `<div class="app-shell is-mobile">${lostModal()}</div>`;
 </script>

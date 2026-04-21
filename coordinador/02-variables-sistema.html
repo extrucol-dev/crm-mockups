@@ -100,27 +100,7 @@ const grupos = [
       { name: 'Meta actividades por semana', desc: 'Objetivo de actividades por ejecutivo', key: 'meta_actividades_semana', value: '20', unit: 'actividades' },
       { name: 'Meta oportunidades abiertas', desc: 'Cantidad mínima por ejecutivo', key: 'meta_opp_abiertas', value: '10', unit: 'opp' },
     ]
-  },
-  {
-    title: 'Seguridad y auditoría',
-    desc: 'Controles de trazabilidad y acceso al sistema',
-    icon: 'shieldCheck', iconClass: 'success',
-    vars: [
-      { name: 'Auditoría habilitada', desc: 'Registrar todos los cambios críticos', key: 'auditoria_habilitada', value: 'true', unit: 'toggle' },
-      { name: 'Tiempo sesión máxima', desc: 'Cierre automático de sesión inactiva', key: 'tiempo_sesion_maxima', value: '60', unit: 'min' },
-      { name: 'Intentos login máximos', desc: 'Antes de bloquear cuenta', key: 'intentos_login_max', value: '5', unit: 'intentos' },
-    ]
-  },
-  {
-    title: 'Geolocalización',
-    desc: 'Validación de ubicación en actividades de campo',
-    icon: 'gps', iconClass: '',
-    vars: [
-      { name: 'GPS obligatorio en visitas', desc: 'Requerir captura de ubicación', key: 'gps_obligatorio_visitas', value: 'true', unit: 'toggle' },
-      { name: 'Precisión mínima GPS', desc: 'Radio máximo aceptable', key: 'precision_minima_gps', value: '50', unit: 'metros' },
-      { name: 'Validar cercanía a cliente', desc: 'Verificar que la visita esté cerca del domicilio registrado', key: 'validar_cercania_cliente', value: 'false', unit: 'toggle' },
-    ]
-  },
+  }
 ];
 
 function renderVarRow(v, bp) {
@@ -192,12 +172,7 @@ function content(bp) {
           <div class="page-head__title">Variables del sistema</div>
           <div class="page-head__subtitle">14 variables organizadas en 4 categorías · Última actualización: hace 2 días</div>
         </div>
-        ${!isMobile ? `
-          <div class="page-head__actions">
-            <button class="btn btn--secondary btn--sm">${Icons.clock} Historial de cambios</button>
-            <button class="btn btn--secondary btn--sm">${Icons.download} Exportar</button>
-          </div>
-        ` : ''}
+        
       </div>
 
       <!-- Alerta de advertencia -->
@@ -205,7 +180,6 @@ function content(bp) {
         ${Icons.warning}
         <div>
           <strong>Cambios con impacto operacional.</strong> Las variables afectan el funcionamiento del sistema en tiempo real.
-          Los cambios quedan registrados en auditoría con fecha, usuario y valores anterior/nuevo.
         </div>
       </div>
 
@@ -219,11 +193,8 @@ function content(bp) {
             <option>Todas las categorías</option>
             <option>Alertas y notificaciones</option>
             <option>Reglas comerciales</option>
-            <option>Seguridad y auditoría</option>
-            <option>Geolocalización</option>
           </select>
           <div style="margin-left: auto; display: flex; gap: 8px;">
-            <button class="btn btn--secondary btn--sm">Restaurar valores por defecto</button>
             <button class="btn btn--primary btn--sm">${Icons.check} Guardar cambios</button>
           </div>
         </div>

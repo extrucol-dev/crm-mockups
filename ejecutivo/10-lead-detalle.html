@@ -57,27 +57,10 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-
-    <div style="margin-bottom: 20px;">
-      <div class="canvas-title">👔 EJECUTIVO — Detalle de Lead + Conversión a Oportunidad</div>
-      <div class="canvas-subtitle">
-        Vista de detalle del lead con timeline de estados, intereses, actividades y botón de conversión.
-      </div>
-    </div>
-
-    <div class="canvas-section-title">📋 Vista 1 — Detalle del Lead</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-det"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-det"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-det"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">🔄 Vista 2 — Modal de conversión Lead → Oportunidad</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop" style="height: 900px; position: relative;" id="d-conv"></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile" style="height: 812px; position: relative;" id="m-conv"></div></div>
+<div>
+  <div>
+    <div>
+      <div><div><div class="app-shell" id="d-det"></div></div></div>
     </div>
   </div>
 </div>
@@ -110,9 +93,16 @@ function detailContent(bp) {
         </div>
         ${bp !== 'mobile' ? `
           <div style="display: flex; gap: 8px; flex-shrink: 0;">
-            <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
-            <button class="btn btn--secondary btn--sm">${Icons.xCircle} Descalificar</button>
-            <button class="btn btn--primary btn--sm" style="background: var(--success);">${Icons.arrowRight} Convertir a oportunidad</button>
+            <a href="https://ejemplo.com" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
+            </a>
+            <a href="https://ejemplo.com" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--secondary btn--sm">${Icons.xCircle} Descalificar</button>
+            </a>
+            <a href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--primary btn--sm" style="background: var(--success);">${Icons.arrowRight} Convertir a oportunidad</button>
+            </a>
+            
           </div>
         ` : `<button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.arrowRight} Convertir</button>`}
       </div>
@@ -205,7 +195,9 @@ function detailContent(bp) {
       <div class="card">
         <div class="card__header"><div class="card__title">Acciones</div></div>
         <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
-          <button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.arrowRight} Convertir a oportunidad</button>
+            <a href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--primary btn--sm" style="background: var(--success); width: 100%;">${Icons.arrowRight} Convertir a oportunidad</button>
+            </a>
           <button class="btn btn--secondary btn--block">${Icons.arrowRight} Trasladar a distribuidor</button>
           <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Descalificar lead</button>
         </div>
@@ -346,7 +338,9 @@ function conversionModal(bp) {
         </div>
         <div class="modal-footer">
           <button class="btn btn--secondary">Cancelar</button>
-          <button class="btn btn--primary">${Icons.check} Convertir a oportunidad</button>
+            <a class="btn btn--primary btn--sm"  href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="btn btn--primary btn--sm" style="background: var(--success); width: 100%;">${Icons.arrowRight} Convertir a oportunidad</button>
+            </a>
         </div>
       </div>
     </div>

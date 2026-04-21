@@ -83,8 +83,8 @@ function renderSidebar(activeItem = 'dashboard', role = 'ejecutivo') {
       user: { name: 'Juan Pérez', role: 'Ejecutivo', initial: 'JP' },
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: 'home', route: '01-dashboard.html' },
-        { id: 'leads', label: 'Leads', icon: 'funnel', badge: '8', route: '03-leads-kanban.html' },
-        { id: 'oportunidades', label: 'Oportunidades', icon: 'briefcase', badge: '12', route: '02-oportunidades-kanban.html' },
+        { id: 'leads', label: 'Leads', icon: 'funnel', route: '03-leads-kanban.html' },
+        { id: 'oportunidades', label: 'Oportunidades', icon: 'briefcase', route: '02-oportunidades-kanban.html' },
         { id: 'clientes', label: 'Clientes', icon: 'users', route: '06-clientes.html' },
         { id: 'actividades', label: 'Actividades', icon: 'clipboard', route: '07-actividades.html' },
         { id: 'proyectos', label: 'Proyectos', icon: 'folder', route: '08-proyectos.html' },
@@ -105,12 +105,12 @@ function renderSidebar(activeItem = 'dashboard', role = 'ejecutivo') {
       user: { name: 'Diana Ruiz', role: 'Coordinador', initial: 'DR' },
       items: [
         { id: 'dashboard', label: 'Panel seguimiento', icon: 'home', route: '01-dashboard.html' },
-        { id: 'alertas', label: 'Alertas activas', icon: 'bell', badge: '5', route: '01-dashboard.html' },
+        { id: 'alertas', label: 'Alertas activas', icon: 'bell', route: '01-dashboard.html' },
         { id: 'variables', label: 'Variables sistema', icon: 'adjustments', route: '02-variables-sistema.html' },
         { id: 'monitoreo', label: 'Monitoreo ejecutivos', icon: 'view', route: '03-monitoreo-mapa-notif.html' },
         { id: 'estancados', label: 'Leads/Opp estancados', icon: 'clock', route: '05-estancados.html' },
-        { id: 'mapa', label: 'Mapa actividades', icon: 'gps', route: '03-monitoreo-mapa-notif.html' },
-        { id: 'notificaciones', label: 'Log notificaciones', icon: 'inbox', route: '03-monitoreo-mapa-notif.html' },
+        { id: 'mapa', label: 'Mapa actividades', icon: 'gps', route: '06-mapa-actividades.html' },
+        { id: 'notificaciones', label: 'Log notificaciones', icon: 'inbox', route: '07-log-otificaciones.html' },
         { id: 'cumplimiento', label: 'Cumplimiento', icon: 'clipboardCheck', route: '04-cumplimiento.html' },
       ]
     },

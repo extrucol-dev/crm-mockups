@@ -159,21 +159,33 @@ function detailContent(bp) {
             <td><span class="badge badge--propuesta"><span class="dot"></span> Propuesta</span></td>
             <td style="font-weight: 600;">$ 485 M</td>
             <td>25 Abr 2026</td>
-            <td><button class="table__action">${Icons.chevronRight}</button></td>
+            <td>
+              <a href="04-oportunidad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="table__action">${Icons.chevronRight}</button>
+              </a>
+            </td>
           </tr>
           <tr>
             <td><div style="font-weight: 600; color: var(--text-primary);">Suministro tubería Q1</div><div style="font-size: 11.5px; color: var(--text-muted);">OPP-2024-0198</div></td>
             <td><span class="badge badge--ganada"><span class="dot"></span> Ganada</span></td>
             <td style="font-weight: 600;">$ 215 M</td>
             <td>15 Dic 2024</td>
-            <td><button class="table__action">${Icons.chevronRight}</button></td>
+            <td>
+              <a href="04-oportunidad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="table__action">${Icons.chevronRight}</button>
+              </a>
+            </td>
           </tr>
           <tr>
             <td><div style="font-weight: 600; color: var(--text-primary);">Ampliación red sector 4</div><div style="font-size: 11.5px; color: var(--text-muted);">OPP-2024-0156</div></td>
             <td><span class="badge badge--ganada"><span class="dot"></span> Ganada</span></td>
             <td style="font-weight: 600;">$ 180 M</td>
             <td>30 Sep 2024</td>
-            <td><button class="table__action">${Icons.chevronRight}</button></td>
+            <td>
+              <a href="04-oportunidad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+              <button class="table__action">${Icons.chevronRight}</button>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -201,7 +213,9 @@ function detailContent(bp) {
         ${bp !== 'mobile' ? `
           <div style="display: flex; gap: 8px;">
             <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
+                      <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
             <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button>
+          </a>
           </div>
         ` : ''}
       </div>

@@ -91,27 +91,8 @@
 <body>
 <div>
   <div>
-
-
-    <div class="canvas-section-title">📋 Vista 1 — Monitoreo Detallado de Ejecutivos</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-mon"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-mon"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-mon"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">📍 Vista 2 — Mapa Consolidado de Actividades GPS</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-map"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-map"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-map"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">🔔 Vista 3 — Log de Notificaciones</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-not"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-not"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-not"></div></div></div>
+    <div>
+      <div><div><div class="app-shell" id="d-not"></div></div></div>
     </div>
   </div>
 </div>
@@ -400,13 +381,13 @@ function notifContent(bp) {
   const isMobile = bp === 'mobile';
 
   const notificaciones = [
-    { tipo: 'error', icon: 'warning', title: 'Alerta: Lead estancado', subtitle: 'Lead "Proyecto acueducto EMPAS" sin contactar hace 5 días', to: 'Juan Pérez', via: 'Email + Push', time: 'Hace 5 min', canal: 'email' },
-    { tipo: 'warning', icon: 'clock', title: 'Recordatorio: Oportunidad estancada', subtitle: 'OPP-2025-0038 sin actividad hace 7 días', to: 'María García', via: 'Push', time: 'Hace 1h', canal: 'push' },
+    { tipo: 'error', icon: 'warning', title: 'Alerta: Lead estancado', subtitle: 'Lead "Proyecto acueducto EMPAS" sin contactar hace 5 días', to: 'Juan Pérez', via: 'Email', time: 'Hace 5 min', canal: 'email' },
+    { tipo: 'warning', icon: 'clock', title: 'Recordatorio: Oportunidad estancada', subtitle: 'OPP-2025-0038 sin actividad hace 7 días', to: 'María García', via: 'Email', time: 'Hace 1h', canal: 'email' },
     { tipo: 'info', icon: 'bell', title: 'Reporte diario enviado', subtitle: 'Resumen automático de actividades del día', to: 'Todo el equipo', via: 'Email', time: 'Ayer 18:00', canal: 'email' },
     { tipo: 'error', icon: 'warning', title: 'Escalamiento crítico', subtitle: 'Oportunidad sin actividad hace 14 días', to: 'Carlos Muñoz (Director)', via: 'Email', time: 'Ayer 10:30', canal: 'email' },
-    { tipo: 'success', icon: 'trophy', title: 'Felicitación por meta alcanzada', subtitle: 'María García superó la meta mensual', to: 'María García', via: 'Push', time: 'Ayer 09:00', canal: 'push' },
-    { tipo: 'warning', icon: 'clock', title: 'Aviso: Actividad programada', subtitle: 'Reunión técnica en 1 hora', to: 'Ana Martínez', via: 'Push', time: 'Ayer 08:30', canal: 'push' },
-    { tipo: 'info', icon: 'bell', title: 'Nueva oportunidad asignada', subtitle: 'Se ha asignado una nueva oportunidad de $85M', to: 'Juan Pérez', via: 'Email + Push', time: 'Hace 2 días', canal: 'email' },
+    { tipo: 'success', icon: 'trophy', title: 'Felicitación por meta alcanzada', subtitle: 'María García superó la meta mensual', to: 'María García', via: 'Email', time: 'Ayer 09:00', canal: 'email' },
+    { tipo: 'warning', icon: 'clock', title: 'Aviso: Actividad programada', subtitle: 'Reunión técnica en 1 hora', to: 'Ana Martínez', via: 'Email', time: 'Ayer 08:30', canal: 'email' },
+    { tipo: 'info', icon: 'bell', title: 'Nueva oportunidad asignada', subtitle: 'Se ha asignado una nueva oportunidad de $85M', to: 'Juan Pérez', via: 'Email', time: 'Hace 2 días', canal: 'email' },
     { tipo: 'error', icon: 'warning', title: 'Alerta: 3 leads sin contactar', subtitle: 'Ejecutivo con múltiples leads estancados', to: 'Carlos Rodríguez', via: 'Email', time: 'Hace 2 días', canal: 'email' },
   ];
 
@@ -426,7 +407,7 @@ function notifContent(bp) {
       </div>
 
       <!-- Stats -->
-      <div style="display: grid; grid-template-columns: repeat(${isMobile ? 2 : 4}, 1fr); gap: 12px; margin-bottom: 20px;">
+      <div style="display: grid; grid-template-columns: repeat(${isMobile ? 2 : 3}, 1fr); gap: 12px; margin-bottom: 20px;">
         <div class="stat-card">
           <div class="stat-card__icon" style="background: #FDECEA; color: var(--error);">${Icons.warning}</div>
           <div class="stat-card__label">Alertas críticas</div>
@@ -443,11 +424,6 @@ function notifContent(bp) {
           <div class="stat-card__value">48</div>
           <div class="stat-card__subtext">Esta semana</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--green">${Icons.bell}</div>
-          <div class="stat-card__label">Push enviados</div>
-          <div class="stat-card__value stat-card__value--green">126</div>
-        </div>
       </div>
 
       <div class="filter-bar">
@@ -460,10 +436,6 @@ function notifContent(bp) {
             <option>Alertas críticas</option>
             <option>Advertencias</option>
             <option>Información</option>
-          </select>
-          <select class="select" style="max-width: 180px;">
-            <option>Todos los canales</option>
-            <option>Email</option><option>Push</option><option>SMS</option>
           </select>
           <select class="select" style="max-width: 180px;">
             <option>Todos los destinatarios</option>
@@ -496,13 +468,6 @@ function notifContent(bp) {
   `;
 }
 
-document.getElementById('d-mon').innerHTML = `${renderSidebar('monitoreo','coordinador')}<div class="main-area">${renderTopbar({title:'Monitoreo'})}${monitoreoContent('desktop')}</div>`;
-document.getElementById('t-mon').innerHTML = `${renderSidebar('monitoreo','coordinador')}<div class="main-area">${renderTopbar({title:'Monitoreo'})}${monitoreoContent('tablet')}</div>`;
-document.getElementById('m-mon').innerHTML = `<div class="main-area">${renderTopbar({title:'Monitoreo'})}${monitoreoContent('mobile')}</div>`;
-
-document.getElementById('d-map').innerHTML = `${renderSidebar('mapa','coordinador')}<div class="main-area">${renderTopbar({title:'Mapa de actividades'})}${mapaContent('desktop')}</div>`;
-document.getElementById('t-map').innerHTML = `${renderSidebar('mapa','coordinador')}<div class="main-area">${renderTopbar({title:'Mapa'})}${mapaContent('tablet')}</div>`;
-document.getElementById('m-map').innerHTML = `<div class="main-area">${renderTopbar({title:'Mapa'})}${mapaContent('mobile')}</div>`;
 
 document.getElementById('d-not').innerHTML = `${renderSidebar('notificaciones','coordinador')}<div class="main-area">${renderTopbar({title:'Notificaciones'})}${notifContent('desktop')}</div>`;
 document.getElementById('t-not').innerHTML = `${renderSidebar('notificaciones','coordinador')}<div class="main-area">${renderTopbar({title:'Notificaciones'})}${notifContent('tablet')}</div>`;

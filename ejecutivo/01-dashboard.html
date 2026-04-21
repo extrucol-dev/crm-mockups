@@ -163,7 +163,9 @@ function dashboardContent(bp = 'desktop') {
         ${bp !== 'mobile' ? `
           <div class="page-head__actions">
             <button class="btn btn--secondary btn--sm">${Icons.calendar} Esta semana</button>
-            <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button>
+            <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+                <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button></a>
+            
           </div>
         ` : ''}
       </div>

@@ -49,39 +49,41 @@ function proyectoCard(p) {
   const iconClass = p.icon === 'success' ? 'proyecto-card__icon--success'
                   : p.icon === 'warning' ? 'proyecto-card__icon--warning' : '';
   return `
-    <div class="proyecto-card">
-      <div class="proyecto-card__header">
-        <div class="proyecto-card__icon ${iconClass}">${Icons.folder}</div>
-        <div style="flex:1; min-width: 0;">
-          <div style="font-weight:700; color: var(--text-primary); font-size: 14px; line-height: 1.3;">${p.nombre}</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${p.empresa}</div>
+    <a href="15-proyecto-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">           
+      <div class="proyecto-card">
+        <div class="proyecto-card__header">
+          <div class="proyecto-card__icon ${iconClass}">${Icons.folder}</div>
+          <div style="flex:1; min-width: 0;">
+            <div style="font-weight:700; color: var(--text-primary); font-size: 14px; line-height: 1.3;">${p.nombre}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${p.empresa}</div>
+          </div>
+          <span class="badge badge--${p.badge}"><span class="dot"></span> ${p.estado}</span>
         </div>
-        <span class="badge badge--${p.badge}"><span class="dot"></span> ${p.estado}</span>
-      </div>
 
-      <div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">
-          <span>Progreso</span>
-          <span style="font-weight: 700; color: var(--text-primary);">${p.progress}%</span>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">
+            <span>Progreso</span>
+            <span style="font-weight: 700; color: var(--text-primary);">${p.progress}%</span>
+          </div>
+          <div class="progress__bar"><div class="progress__fill ${p.progress === 100 ? 'progress__fill--success' : ''}" style="width: ${p.progress}%"></div></div>
         </div>
-        <div class="progress__bar"><div class="progress__fill ${p.progress === 100 ? 'progress__fill--success' : ''}" style="width: ${p.progress}%"></div></div>
-      </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-        <div>
-          <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Inicio</div>
-          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">${p.inicio}</div>
-        </div>
-        <div>
-          <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Fin</div>
-          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">${p.fin}</div>
-        </div>
-        <div>
-          <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Valor</div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--accent); margin-top: 2px;">${p.valor}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+          <div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Inicio</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">${p.inicio}</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Fin</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-top: 2px;">${p.fin}</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--text-disabled); font-weight: 600; letter-spacing: 0.04em;">Valor</div>
+            <div style="font-size: 12.5px; font-weight: 700; color: var(--accent); margin-top: 2px;">${p.valor}</div>
+          </div>
         </div>
       </div>
-    </div>
+    </a>
   `;
 }
 

@@ -15,19 +15,9 @@
 </head>
 <body>
 <div >
-  <div >
 
-
-    <!-- ═══ VISTA 1: GRID DE CLIENTES ═══ -->
-    <div>
-      <div>
         <div><div class="app-shell" id="grid-desktop"></div></div>
-      </div>
-    </div>
 
-
-
-  </div>
 </div>
 
 <script src="../shared/components.js"></script>
@@ -43,28 +33,30 @@ const clientes = [
 
 function clienteCard(c) {
   return `
-    <div class="cliente-card">
-      <div class="cliente-card__header">
-        <div class="avatar avatar--color-${c.color}">${c.avatar}</div>
-        <div style="flex:1; min-width: 0;">
-          <div class="cliente-card__name">${c.name}</div>
-          <div class="cliente-card__company">${c.company}</div>
+    <a href="14-cliente-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+      <div class="cliente-card">
+        <div class="cliente-card__header">
+          <div class="avatar avatar--color-${c.color}">${c.avatar}</div>
+          <div style="flex:1; min-width: 0;">
+            <div class="cliente-card__name">${c.name}</div>
+            <div class="cliente-card__company">${c.company}</div>
+          </div>
+          <span class="badge badge--${c.badge}">${c.sector}</span>
         </div>
-        <span class="badge badge--${c.badge}">${c.sector}</span>
-      </div>
-      <div class="cliente-card__info">
-        <div class="cliente-card__info-row">${Icons.mapPin}<span>${c.city}</span></div>
-        <div class="cliente-card__info-row">${Icons.phone}<span>${c.phone}</span></div>
-        <div class="cliente-card__info-row">${Icons.envelope}<span style="overflow: hidden; text-overflow: ellipsis;">${c.email}</span></div>
-      </div>
-      <div class="cliente-card__footer">
-        <span>${Icons.calendar} Desde ${c.registered}</span>
-        <div style="display:flex; align-items:center; gap: 6px;">
-          ${c.recurrente ? '<span class="badge badge--ganada" style="font-size: 10px;">Recurrente</span>' : '<span class="badge badge--info" style="font-size: 10px;">Nuevo</span>'}
-          ${Icons.chevronRight}
+        <div class="cliente-card__info">
+          <div class="cliente-card__info-row">${Icons.mapPin}<span>${c.city}</span></div>
+          <div class="cliente-card__info-row">${Icons.phone}<span>${c.phone}</span></div>
+          <div class="cliente-card__info-row">${Icons.envelope}<span style="overflow: hidden; text-overflow: ellipsis;">${c.email}</span></div>
+        </div>
+        <div class="cliente-card__footer">
+          <span>${Icons.calendar} Desde ${c.registered}</span>
+          <div style="display:flex; align-items:center; gap: 6px;">
+            ${c.recurrente ? '<span class="badge badge--ganada" style="font-size: 10px;">Recurrente</span>' : '<span class="badge badge--info" style="font-size: 10px;">Nuevo</span>'}
+            ${Icons.chevronRight}
+          </div>
         </div>
       </div>
-    </div>
+    </a>
   `;
 }
 

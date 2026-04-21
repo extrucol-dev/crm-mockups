@@ -85,16 +85,16 @@ const leadsData = {
     { titulo: 'Interesado en accesorios', empresa: 'Distribuidora del Sur', origen: 'Facebook', intereses: ['Accesorios'], score: 52, age: '3h', avatar: 'DS', color: 4 },
   ]},
   CONTACTADO: { color: '#A855F7', label: 'Contactado', badgeClass: 'propuesta', items: [
-    { titulo: 'Proyecto acueducto municipal', empresa: 'Alcaldía de Piedecuesta', origen: 'Referido', intereses: ['Tubería PE', 'Asesoría'], score: 78, age: '5d', avatar: 'AP', color: 1 },
+    { titulo: 'Proyecto acueducto municipal', empresa: 'Alcaldía de Piedecuesta', origen: 'Página Web', intereses: ['Tubería PE', 'Asesoría'], score: 78, age: '5d', avatar: 'AP', color: 1 },
     { titulo: 'Ampliación red residencial', empresa: 'Urbanizadora Andina', origen: 'Instagram', intereses: ['Tubería PE'], score: 68, age: '4d', avatar: 'UA', color: 6 },
     { titulo: 'Sistema riego invernadero', empresa: 'Floricultura San José', origen: 'Página Web', intereses: ['Riego'], score: 72, age: '3d', avatar: 'FS', color: 3 },
   ]},
   INTERESADO: { color: '#F39610', label: 'Interesado', badgeClass: 'calificacion', items: [
-    { titulo: 'Suministro anual de tubería', empresa: 'Constructora Bolívar', origen: 'Referido', intereses: ['Tubería PE', 'Accesorios'], score: 86, age: '7d', avatar: 'CB', color: 2 },
-    { titulo: 'Red matriz barrio nuevo', empresa: 'Servientrega Colombia', origen: 'Llamada', intereses: ['Tubería PE'], score: 82, age: '6d', avatar: 'SC', color: 4 },
+    { titulo: 'Suministro anual de tubería', empresa: 'Constructora Bolívar', origen: 'Página Web', intereses: ['Tubería PE', 'Accesorios'], score: 86, age: '7d', avatar: 'CB', color: 2 },
+    { titulo: 'Red matriz barrio nuevo', empresa: 'Servientrega Colombia', origen: 'Facebook', intereses: ['Tubería PE'], score: 82, age: '6d', avatar: 'SC', color: 4 },
   ]},
   CALIFICADO: { color: '#22C55E', label: 'Calificado', badgeClass: 'ganada', items: [
-    { titulo: 'Proyecto acueducto rural', empresa: 'EMPAS S.A.', origen: 'Licitación', intereses: ['Tubería PE', 'Asesoría'], score: 92, age: '10d', avatar: 'ES', color: 1 },
+    { titulo: 'Proyecto acueducto rural', empresa: 'EMPAS S.A.', origen: 'WhatsApp', intereses: ['Tubería PE', 'Asesoría'], score: 92, age: '10d', avatar: 'ES', color: 1 },
   ]},
   DESCALIFICADO: { color: '#EF4444', label: 'No Interesado', badgeClass: 'perdida', items: [
     { titulo: 'Cotización menor', empresa: 'Ferretería Central', origen: 'WhatsApp', intereses: ['Accesorios'], score: 25, age: '8d', avatar: 'FC', color: 5 },
@@ -104,24 +104,26 @@ const leadsData = {
 function renderLeadCard(l, estadoKey) {
   const s = leadsData[estadoKey];
   return `
-    <div class="lead-card">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <span class="lead-card__origen">${Icons.globe} ${l.origen}</span>
-        <button class="topbar__icon-btn" style="width:24px; height:24px;">${Icons.dots}</button>
-      </div>
-      <div class="lead-card__title">${l.titulo}</div>
-      <div class="lead-card__empresa">${l.empresa}</div>
-      <div class="lead-card__intereses">
-        ${l.intereses.map(i => `<span class="lead-card__interes-chip">${i}</span>`).join('')}
-      </div>
-      <div class="lead-card__footer">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div class="avatar avatar--xs avatar--color-${l.color}">${l.avatar}</div>
-          <span class="lead-card__score">${Icons.fire} ${l.score}</span>
+    <a href="10-lead-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+      <div class="lead-card">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span class="lead-card__origen">${Icons.globe} ${l.origen}</span>
+          <button class="topbar__icon-btn" style="width:24px; height:24px;">${Icons.dots}</button>
         </div>
-        <span class="lead-card__age">${l.age}</span>
+        <div class="lead-card__title">${l.titulo}</div>
+        <div class="lead-card__empresa">${l.empresa}</div>
+        <div class="lead-card__intereses">
+          ${l.intereses.map(i => `<span class="lead-card__interes-chip">${i}</span>`).join('')}
+        </div>
+        <div class="lead-card__footer">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="avatar avatar--xs avatar--color-${l.color}">${l.avatar}</div>
+            <span class="lead-card__score">${Icons.fire} ${l.score}</span>
+          </div>
+          <span class="lead-card__age">${l.age}</span>
+        </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
@@ -191,7 +193,9 @@ function content(bp) {
         </div>
         <div class="page-head__actions">
           <button class="btn btn--secondary btn--sm">${Icons.filter} Filtros</button>
-          <button class="btn btn--primary btn--sm">${Icons.plus} Nuevo lead</button>
+          <a href="09-lead-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+            <button class="btn btn--primary btn--sm">${Icons.plus} Nuevo lead</button>
+          </a>
         </div>
       </div>
 
@@ -232,17 +236,6 @@ function content(bp) {
 document.getElementById('desktop-shell').innerHTML = `
   ${renderSidebar('leads', 'ejecutivo')}
   <div class="main-area">${renderTopbar({ title: 'Mis Leads' })}${content('desktop')}</div>
-`;
-document.getElementById('tablet-shell').innerHTML = `
-  ${renderSidebar('leads', 'ejecutivo')}
-  <div class="main-area">${renderTopbar({ title: 'Leads' })}${content('tablet')}</div>
-`;
-document.getElementById('mobile-shell').innerHTML = `
-  <div class="main-area">
-    ${renderTopbar({ title: 'Leads', actions: `<button class="topbar__icon-btn">${Icons.filter}</button><button class="topbar__icon-btn">${Icons.plus}</button>` })}
-    ${content('mobile')}
-    ${renderMobileBottomNav('leads')}
-  </div>
 `;
 </script>
 </body>

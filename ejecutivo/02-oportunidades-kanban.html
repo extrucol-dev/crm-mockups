@@ -134,16 +134,18 @@ const estadoLabels = {
 function renderKanbanCard(op, estadoKey) {
   const s = estadoLabels[estadoKey];
   return `
-    <div class="kanban-card">
-      <span class="badge badge--${s.badgeClass}"><span class="dot"></span> ${s.label}</span>
-      <div class="kanban-card__title">${op.titulo}</div>
-      <div class="kanban-card__company">${op.empresa}</div>
-      <div class="kanban-card__value">${op.valor}</div>
-      <div class="kanban-card__footer">
-        <span class="kanban-card__date">${Icons.calendar} ${op.fecha}</span>
-        <div class="avatar avatar--xs avatar--color-${op.color}">${op.avatar}</div>
+    <a href="04-oportunidad-detalle.html" style="text-decoration: none; color: inherit;">
+      <div class="kanban-card">
+        <span class="badge badge--${s.badgeClass}"><span class="dot"></span> ${s.label}</span>
+        <div class="kanban-card__title">${op.titulo}</div>
+        <div class="kanban-card__company">${op.empresa}</div>
+        <div class="kanban-card__value">${op.valor}</div>
+        <div class="kanban-card__footer">
+          <span class="kanban-card__date">${Icons.calendar} ${op.fecha}</span>
+          <div class="avatar avatar--xs avatar--color-${op.color}">${op.avatar}</div>
+        </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
@@ -212,7 +214,9 @@ function kanbanContent(bp = 'desktop') {
         </div>
         <div class="page-head__actions">
           <button class="btn btn--secondary btn--sm">${Icons.filter} Filtros</button>
-          <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button>
+          <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+            <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button>
+          </a>
         </div>
       </div>
 

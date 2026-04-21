@@ -115,9 +115,11 @@ function content(bp) {
           <div class="page-head__subtitle">${allStancados.length} registros sin actividad · Umbrales configurados: Leads &gt; 3 días · Opp &gt; 7 días</div>
         </div>
         <div class="page-head__actions">
-          <button class="btn btn--secondary btn--sm">${Icons.adjustments} Configurar umbrales</button>
+
           <button class="btn btn--secondary btn--sm">${Icons.download} Exportar</button>
-          <button class="btn btn--primary btn--sm">${Icons.bell} Notificar a ejecutivos</button>
+          <a href="02-variables-sistema.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+            <button class="btn btn--primary btn--sm">${Icons.adjustments} Configurar umbrales</button>
+          </a>
         </div>
       </div>
 
@@ -195,7 +197,9 @@ function content(bp) {
             <div style="text-align: right; display: flex; gap: 4px; justify-content: flex-end;">
               <button class="btn btn--ghost btn--sm" title="Notificar">${Icons.bell}</button>
               <button class="btn btn--ghost btn--sm" title="Reasignar">${Icons.users}</button>
-              <button class="btn btn--ghost btn--sm" title="Ver">${Icons.chevronRight}</button>
+              <a href="../ejecutivo/04-oportunidad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+                <button class="btn btn--ghost btn--sm" title="Ver">${Icons.chevronRight}</button>
+              </a>
             </div>
           </div>
         `).join('')}
