@@ -2,192 +2,154 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRM Extrucol · Ejecutivo · Cierre Oportunidad</title>
+<title>CRM Extrucol · Ejecutivo · Cierre Oportunidad - Perdida</title>
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 24px; }
-  .canvas-section-title { font: 700 15px 'Roboto'; color: #24388C; margin: 40px 0 20px; padding: 8px 14px; background: #fff; border: 1px solid #E5E5E5; border-radius: 6px; display: inline-block; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; margin-bottom: 30px; }
-  .bp-col { display: flex; flex-direction: column; }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
 
-  .modal-overlay {
-    position: absolute; inset: 0;
-    background: rgba(26,26,26,0.5);
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 60px 24px; z-index: 100;
-  }
-  .modal-content {
-    background: var(--surface); border-radius: 12px;
-    max-width: 520px; width: 100%;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15); overflow: hidden;
-  }
-  .modal-header {
-    padding: 20px 24px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
-  }
-  .modal-header__icon--success {
-    width: 44px; height: 44px; background: var(--success-bg); color: var(--success);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  }
-  .modal-header__icon--error {
-    width: 44px; height: 44px; background: var(--error-bg); color: var(--error);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  }
-  .modal-body { padding: 20px 24px; }
-  .modal-footer {
-    padding: 16px 24px; border-top: 1px solid var(--border);
-    display: flex; justify-content: flex-end; gap: 10px; background: var(--page-bg);
-  }
-
-  .motivo-option {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; border: 1px solid var(--border);
-    border-radius: 8px; cursor: pointer;
-    transition: all 180ms;
-    margin-bottom: 8px;
-  }
-  .motivo-option:hover { border-color: var(--primary); background: var(--primary-bg); }
-  .motivo-option.is-selected { border-color: var(--error); background: var(--error-bg); }
-  .motivo-option.is-selected--success { border-color: var(--success); background: var(--success-bg); }
-  .motivo-option__radio {
-    width: 18px; height: 18px; border-radius: 50%;
-    border: 2px solid var(--border-input);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .motivo-option.is-selected .motivo-option__radio {
-    border-color: var(--error);
-  }
-  .motivo-option.is-selected .motivo-option__radio::after {
-    content: ''; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--error);
-  }
-  .motivo-option.is-selected--success .motivo-option__radio {
-    border-color: var(--success);
-  }
-  .motivo-option.is-selected--success .motivo-option__radio::after {
-    content: ''; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--success);
-  }
-
-  .confetti {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 99;
-  }
-  .confetti::before, .confetti::after {
-    content: '🎉';
-    position: absolute;
-    font-size: 32px;
-    animation: float 3s ease-in-out infinite;
-  }
-  .confetti::before { top: 40px; left: 30%; }
-  .confetti::after { top: 100px; right: 28%; animation-delay: 0.5s; }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-15px) rotate(10deg); }
-  }
+.motivo-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer; transition: all 180ms;
+  margin-bottom: 8px; user-select: none;
+}
+.motivo-option:hover { border-color: var(--primary); background: var(--primary-bg); }
+.motivo-option.is-selected { border-color: var(--error); background: var(--error-bg); }
+.motivo-option__radio {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-input);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.motivo-option.is-selected .motivo-option__radio { border-color: var(--error); }
+.motivo-option.is-selected .motivo-option__radio::after {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--error);
+}
 </style>
 </head>
 <body>
-<div>
-  <div>
-    
-    <div>
-      <div><div style="height: 1000px; position: relative;" id="lost-d"></div></div>
-    </div>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function lostModal() {
-  return `
-    ${renderSidebar('oportunidades','ejecutivo')}
+const currentUser = 'PAOLA';
+const MOTIVOS = [
+  { key: 'precio', label: 'Precio no competitivo', desc: 'Cliente encontro mejor precio en competencia' },
+  { key: 'competencia', label: 'Competencia gano', desc: 'Otro proveedor fue adjudicado' },
+  { key: 'pospuesto', label: 'Cliente pospuso decision', desc: 'Proyecto aplazado indefinidamente' },
+  { key: 'tecnico', label: 'Requerimientos tecnicos no coinciden', desc: 'No tenemos producto para esta necesidad' },
+  { key: 'otro', label: 'Otro motivo', desc: 'Especificar en observaciones' }
+];
+let opp = null;
+let selectedMotivo = 'competencia';
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast is-' + type;
+  t.style.display = 'flex';
+  setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+window.onCRMDataLoaded = function(crm) {
+  const params = new URLSearchParams(window.location.search);
+  const oppId = params.get('id');
+  opp = oppId ? crm.getOportunidadById(oppId) : null;
+  if (!opp) { opp = crm.data.oportunidades[0]; }
+  render(crm);
+};
+
+function render(crm) {
+  const valorFormatted = crm.formatCurrency(opp.valor);
+  const motivoHtml = MOTIVOS.map(m => `
+    <div class="motivo-option ${selectedMotivo === m.key ? 'is-selected' : ''}" data-key="${m.key}" onclick="selectedMotivo='${m.key}';render(CRMData)">
+      <div class="motivo-option__radio"></div>
+      <div>
+        <div style="font-weight: 600; font-size: 13.5px;">${m.label}</div>
+        <div style="font-size: 11.5px; color: var(--text-muted);">${m.desc}</div>
+      </div>
+    </div>`).join('');
+
+  const body = `
+    ${renderSidebar('oportunidades', 'ejecutivo')}
     <div class="main-area">
-      ${renderTopbar({breadcrumb:['Oportunidades','Detalle']})}
-      <div class="content"></div>
-    </div>
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-header__icon--error">${Icons.xCircle}</div>
-          <div>
-            <div style="font-weight: 700; font-size: 18px;">Cerrar como Perdida</div>
-            <div style="font-size: 12.5px; color: var(--text-muted);">El motivo nos ayuda a mejorar</div>
-          </div>
-        </div>
-        <div class="modal-body">
-          <div style="padding: 14px; background: var(--error-bg); border-radius: 8px; margin-bottom: 16px;">
-            <div style="font-size: 11.5px; color: var(--error); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Oportunidad</div>
-            <div style="font-weight: 700; color: var(--text-primary);">Licitación municipal acueducto</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Municipio de X · Valor: $ 65.000.000</div>
-          </div>
+      ${renderTopbar({ breadcrumb: ['Oportunidades', opp.id] })}
+      <div class="content">
+        <div style="max-width: 520px; margin: 0 auto;">
+          <div class="modal-overlay" style="position:relative;">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div style="width:44px;height:44px;background:var(--error-bg);color:var(--error);border-radius:10px;display:flex;align-items:center;justify-content:center;">${Icons.xCircle}</div>
+                <div>
+                  <div style="font-weight: 700; font-size: 18px;">Cerrar como Perdida</div>
+                  <div style="font-size: 12.5px; color: var(--text-muted);">El motivo nos ayuda a mejorar</div>
+                </div>
+                <a href="04-oportunidad-detalle.html?id=${opp.id}" style="margin-left:auto;text-decoration:none;">
+                  <button class="topbar__icon-btn">${Icons.close}</button>
+                </a>
+              </div>
+              <div class="modal-body">
+                <div style="padding: 14px; background: var(--error-bg); border-radius: 8px; margin-bottom: 16px;">
+                  <div style="font-size: 11.5px; color: var(--error); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Oportunidad</div>
+                  <div style="font-weight: 700; color: var(--text-primary);">${opp.nombre}</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${opp.empresa} · Valor: ${valorFormatted}</div>
+                </div>
 
-          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">Motivo de pérdida <span style="color: var(--error);">*</span></div>
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">
+                  Motivo de perdida <span style="color: var(--error);">*</span>
+                </div>
+                ${motivoHtml}
 
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Precio no competitivo</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Cliente encontró mejor precio en competencia</div>
-            </div>
-          </div>
-          <div class="motivo-option is-selected">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Competencia ganó licitación</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Otro proveedor fue adjudicado</div>
-            </div>
-          </div>
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Cliente pospuso decisión</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Proyecto aplazado indefinidamente</div>
-            </div>
-          </div>
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Requerimientos técnicos no coinciden</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">No tenemos producto para esta necesidad</div>
-            </div>
-          </div>
-          <div class="motivo-option">
-            <div class="motivo-option__radio"></div>
-            <div>
-              <div style="font-weight: 600; font-size: 13.5px;">Otro motivo</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Especificar en observaciones</div>
-            </div>
-          </div>
+                <div class="form-field" style="margin: 16px 0;">
+                  <label class="form-field__label">Observaciones detalladas <span style="color:var(--error)">*</span></label>
+                  <textarea class="textarea" id="lost-obs" rows="3" placeholder="Explica que sucedio para poder aprender..."></textarea>
+                </div>
 
-          <div class="form-field" style="margin: 16px 0;">
-            <label class="form-field__label">Observaciones detalladas <span class="req">*</span></label>
-            <textarea class="textarea" rows="3" placeholder="Explica qué sucedió para poder aprender...">La competencia (AguaPlast) ofreció un precio 12% menor con tiempos de entrega similares. Cliente priorizó costo sobre trayectoria.</textarea>
+                <div class="alert alert--info">
+                  ${Icons.chartBar}
+                  <div style="font-size: 12px;">Los motivos de perdida se analizan en reportes del director para mejorar la estrategia comercial.</div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <a href="04-oportunidad-detalle.html?id=${opp.id}" style="text-decoration:none;">
+                  <button class="btn btn--secondary">Cancelar</button>
+                </a>
+                <button class="btn btn--danger" onclick="confirmarCierrePerdida()">
+                  ${Icons.xCircle} Confirmar cierre perdido
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div class="alert alert--info">
-            ${Icons.chartBar}
-            <div style="font-size: 12px;">Los motivos de pérdida se analizan en los reportes del director para mejorar la estrategia comercial.</div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn--secondary">Cancelar</button>
-          <button class="btn btn--danger">${Icons.xCircle} Confirmar cierre perdido</button>
         </div>
       </div>
     </div>
   `;
+
+  document.getElementById('desktop-shell').innerHTML = body;
 }
 
-
-document.getElementById('lost-d').innerHTML = `<div class="app-shell">${lostModal()}</div>`;
-document.getElementById('lost-m').innerHTML = `<div class="app-shell is-mobile">${lostModal()}</div>`;
+function confirmarCierrePerdida() {
+  const obs = document.getElementById('lost-obs').value || '';
+  if (!obs.trim()) {
+    const t = document.getElementById('toast');
+    if (t) { t.textContent = 'Ingresa las observaciones'; t.className = 'toast is-error'; t.style.display = 'flex'; setTimeout(() => { t.style.display = 'none'; }, 3000); }
+    return;
+  }
+  CRMData.updateOportunidad(opp.id, { estado: 'Cerrada Perdida' });
+  CRMData.recalculateMetricas();
+  const t = document.getElementById('toast');
+  if (t) { t.textContent = 'Oportunidad cerrada como PERDIDA'; t.className = 'toast is-success'; t.style.display = 'flex'; setTimeout(() => { t.style.display = 'none'; }, 3500); }
+  setTimeout(() => { window.location.href = '02-oportunidades-kanban.html'; }, 2000);
+}
 </script>
 </body>
 </html>

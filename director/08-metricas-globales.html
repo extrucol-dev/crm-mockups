@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Director · Métricas Globales</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .kpi-highlight {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .kpi-highlight__label { font-size: var(--fs-xxs); font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .kpi-highlight__value { font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
+  .kpi-highlight__value--accent { color: var(--accent); }
+  .kpi-highlight__value--success { color: var(--success); }
+  .kpi-highlight__sub { font-size: var(--fs-small); color: var(--text-muted); margin-top: 4px; }
+  .chart-placeholder {
+    background: linear-gradient(135deg, #E8EEF5 0%, #D7E1EE 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .chart-placeholder::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(36, 56, 140, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(36, 56, 140, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .chart-placeholder__label { font-size: var(--fs-label); font-weight: 600; color: var(--primary); position: relative; z-index: 1; }
+  .chart-placeholder__sub { font-size: var(--fs-xs); color: var(--text-muted); position: relative; z-index: 1; }
+  .funnel-bar {
+    display: flex; align-items: center; gap: 12px; padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .funnel-bar:last-child { border-bottom: none; }
+  .funnel-bar__label { min-width: 140px; font-size: var(--fs-label); font-weight: 600; color: var(--text-secondary); }
+  .funnel-bar__bar { flex: 1; height: 24px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .funnel-bar__fill { height: 100%; border-radius: 6px; }
+  .funnel-bar__value { min-width: 50px; text-align: right; font-weight: 700; font-size: var(--fs-label); color: var(--text-primary); }
+  .sector-row {
+    display: grid; grid-template-columns: 1fr 120px 120px 100px 60px;
+    gap: 14px; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .sector-row:hover { background: var(--page-bg); }
+  .sector-row:last-child { border-bottom: none; }
+  .top-ejecutivo-row {
+    display: grid; grid-template-columns: 40px 1fr 100px 100px 100px 60px;
+    gap: 14px; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .top-ejecutivo-row:hover { background: var(--page-bg); }
+  .top-ejecutivo-row:last-child { border-bottom: none; }
+  .trend-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: var(--fs-xs); font-weight: 700; padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .trend-badge--up { background: var(--success-bg); color: var(--success); }
+  .trend-badge--down { background: var(--error-bg); color: var(--error); }
+</style>
+</head>
+<body>
+<div><div class="app-shell" id="d"></div></div>
+
+<script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
+<script>
+window.onCRMDataLoaded = function(crm) {
+  function content() {
+    const metricas = crm.getMetricas();
+    const allLeads = crm.data.leads;
+    const allOpp = crm.data.oportunidades;
+    const totalPipeline = allOpp.filter(o => !['Cerrada Ganada','Cerrada Perdida'].includes(o.estado)).reduce((s, o) => s + (o.valor || 0), 0);
+    const ventasCerradas = allOpp.filter(o => o.estado === 'Cerrada Ganada').reduce((s, o) => s + (o.valor || 0), 0);
+    const tasa = allLeads.length > 0 ? ((metricas?.oportunidades_por_estado?.find(s => s.estado === 'Cerrada Ganada')?.count || 0) / allLeads.length * 100).toFixed(0) : 0;
+
+    const kpisGlobales = [
+      { label: 'Ventas del equipo', valor: crm.formatCurrency(ventasCerradas).replace('COP', '').trim(), sub: 'Cerradas ganadas', color: '', tendencia: '+12%', up: true },
+      { label: 'Pipeline activo', valor: crm.formatCurrency(totalPipeline).replace('COP', '').trim(), sub: 'Oportunidades activas', color: 'accent', tendencia: '+8%', up: true },
+      { label: 'Tasa conversión global', valor: tasa + '%', sub: 'Lead → Oportunidad', color: 'success', tendencia: '+4%', up: true },
+      { label: 'Oportunidades ganadas', valor: String(metricas?.oportunidades_por_estado?.find(s => s.estado === 'Cerrada Ganada')?.count || 0), sub: 'Este mes', color: 'success', tendencia: '+2', up: true },
+    ];
+
+  const funnelData = [
+    { label: 'Leads nuevos', count: 40, pct: 100, color: '#3B82F6' },
+    { label: 'Contactados', count: 28, pct: 70, color: '#A855F7' },
+    { label: 'Interesados', count: 18, pct: 45, color: '#F97316' },
+    { label: 'Calificados', count: 12, pct: 30, color: '#22C55E' },
+    { label: 'Ganadas mes', count: 9, pct: 22.5, color: '#1A8754' },
+  ];
+
+  const sectoresData = [
+    { nombre: 'Agua Potable', count: 18, valor: '$ 1.850 M', participacion: 43, tendencia: '+15%' },
+    { nombre: 'Gas / Energía', count: 8, valor: '$ 920 M', participacion: 21, tendencia: '+8%' },
+    { nombre: 'Agro / Riego', count: 12, valor: '$ 780 M', participacion: 18, tendencia: '+22%' },
+    { nombre: 'Industrial', count: 9, valor: '$ 490 M', participacion: 11, tendencia: '-3%' },
+    { nombre: 'Otros', count: 4, valor: '$ 240 M', participacion: 7, tendencia: '+5%' },
+  ];
+
+  const topEjecutivos = [
+    { nombre: 'María García', inicial: 'MG', color: 3, ventas: '$ 420 M', meta: '$ 380 M', cumplimiento: 110, tendencia: '+15%', up: true },
+    { nombre: 'Juan Pérez', inicial: 'JP', color: 1, ventas: '$ 385 M', meta: '$ 350 M', cumplimiento: 110, tendencia: '+12%', up: true },
+    { nombre: 'Ana Martínez', inicial: 'AM', color: 4, ventas: '$ 260 M', meta: '$ 320 M', cumplimiento: 81, tendencia: '-5%', up: false },
+    { nombre: 'Laura Jiménez', inicial: 'LJ', color: 2, ventas: '$ 215 M', meta: '$ 280 M', cumplimiento: 77, tendencia: '+8%', up: true },
+    { nombre: 'Carlos Rodríguez', inicial: 'CR', color: 5, ventas: '$ 180 M', meta: '$ 300 M', cumplimiento: 60, tendencia: '-11%', up: false },
+    { nombre: 'Pedro Salazar', inicial: 'PS', color: 6, ventas: '$ 95 M', meta: '$ 250 M', cumplimiento: 38, tendencia: '-18%', up: false },
+  ];
+
+  const mesActual = 'Abril 2026';
+
+  return `
+    <div class="content">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Métricas generales</div>
+          <div class="page-head__subtitle">Resumen del equipo comercial · ${mesActual}</div>
+        </div>
+        <div class="page-head__actions">
+          <select class="select" style="max-width: 160px;">
+            <option>${mesActual}</option>
+            <option>Marzo 2026</option>
+            <option>Febrero 2026</option>
+          </select>
+          <button class="btn btn--secondary btn--sm">${Icons.download} Exportar</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+        ${kpisGlobales.map(k => `
+          <div class="kpi-highlight">
+            <div class="kpi-highlight__label">${k.label}</div>
+            <div class="kpi-highlight__value ${k.color ? 'kpi-highlight__value--' + k.color : ''}">${k.valor}</div>
+            <div class="kpi-highlight__sub">${k.sub}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+        <div class="card">
+          <div class="card__header">
+            <div class="card__title">Funnel de conversión</div>
+            <span class="badge badge--info">${mesActual}</span>
+          </div>
+          <div class="card__body">
+            ${funnelData.map(f => `
+              <div class="funnel-bar">
+                <div class="funnel-bar__label">${f.label}</div>
+                <div class="funnel-bar__bar">
+                  <div class="funnel-bar__fill" style="width: ${f.pct}%; background: ${f.color};"></div>
+                </div>
+                <div class="funnel-bar__value">${f.count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div class="card__title">Ventas por sector</div>
+            <span class="badge badge--accent">${mesActual}</span>
+          </div>
+          <div class="card__body">
+            <div class="chart-placeholder">
+              <div class="chart-placeholder__label">Gráfico de torta por sector</div>
+              <div class="chart-placeholder__sub">Distribución del pipeline por sector comercial</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0; margin-bottom: 16px;">
+        <div class="card__header">
+          <div class="card__title">Top ejecutivos</div>
+          <a href="05-equipo-comercial.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver comparativo ${Icons.arrowRight}</button></a>
+        </div>
+        <div style="padding: 0;">
+          <div class="top-ejecutivo-row" style="background: var(--page-bg); font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">
+            <div></div>
+            <div>Ejecutivo</div>
+            <div style="text-align: right;">Ventas mes</div>
+            <div style="text-align: right;">Meta</div>
+            <div style="text-align: center;">Cumplim.</div>
+            <div style="text-align: center;">Tendencia</div>
+          </div>
+          ${topEjecutivos.map(e => `
+            <div class="top-ejecutivo-row">
+              <div class="avatar avatar--sm avatar--color-${e.color}">${e.inicial}</div>
+              <div style="font-weight: 600; color: var(--text-primary);">${e.nombre}</div>
+              <div style="text-align: right; font-weight: 700; color: var(--accent);">${e.ventas}</div>
+              <div style="text-align: right; color: var(--text-muted);">${e.meta}</div>
+              <div style="text-align: center;">
+                <span style="font-weight: 700; color: ${e.cumplimiento >= 100 ? 'var(--success)' : e.cumplimiento >= 80 ? 'var(--accent)' : 'var(--error)'};">${e.cumplimiento}%</span>
+              </div>
+              <div style="text-align: center;">
+                <span class="trend-badge ${e.up ? 'trend-badge--up' : 'trend-badge--down'}">
+                  ${e.up ? Icons.trendingUp.replace('class="icon"', 'class="icon icon--xs"') : Icons.trendingDown.replace('class="icon"', 'class="icon icon--xs"')}
+                  ${e.tendencia}
+                </span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0;">
+        <div class="card__header">
+          <div class="card__title">Ventas por sector</div>
+          <span class="badge badge--accent">${mesActual}</span>
+        </div>
+        <div style="padding: 0;">
+          <div class="sector-row" style="background: var(--page-bg); font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">
+            <div>Sector</div>
+            <div style="text-align: center;">Oportunidades</div>
+            <div style="text-align: right;">Valor pipeline</div>
+            <div style="text-align: center;">Participación</div>
+            <div style="text-align: center;">Tendencia</div>
+          </div>
+          ${sectoresData.map(s => `
+            <div class="sector-row">
+              <div style="font-weight: 600; color: var(--text-primary);">${s.nombre}</div>
+              <div style="text-align: center; font-weight: 600;">${s.count}</div>
+              <div style="text-align: right; font-weight: 700; color: var(--accent);">${s.valor}</div>
+              <div style="text-align: center;">
+                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                  <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                    <div style="width: ${s.participacion}%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
+                  </div>
+                  <span style="font-size: var(--fs-xs); font-weight: 600;">${s.participacion}%</span>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <span class="trend-badge ${s.tendencia.startsWith('+') ? 'trend-badge--up' : 'trend-badge--down'}">${s.tendencia}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('d').innerHTML = `${renderSidebar('equipo', 'director')}<div class="main-area">${renderTopbar({title:'Métricas generales'})}${content()}</div>`;
+};
+</script>
+</body>
+</html>

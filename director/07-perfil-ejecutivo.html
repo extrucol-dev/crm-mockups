@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Director · Perfil Ejecutivo</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .profile-header {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+    margin-bottom: 16px;
+  }
+  .profile-header__row {
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+  }
+  .profile-info__name { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .profile-info__role { font-size: var(--fs-label); color: var(--text-muted); margin-top: 2px; }
+  .profile-info__depto { font-size: var(--fs-small); color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+  .profile-meta {
+    display: flex; gap: 24px; margin-top: 16px;
+    padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .profile-meta__item { display: flex; flex-direction: column; gap: 2px; }
+  .profile-meta__label { font-size: 10.5px; font-weight: 600; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.06em; }
+  .profile-meta__value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .meta-bar-container {
+    background: var(--page-bg); border-radius: 8px;
+    padding: 14px; margin-bottom: 16px;
+  }
+  .meta-bar-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .meta-bar-title { font-size: var(--fs-label); font-weight: 600; color: var(--text-primary); }
+  .meta-bar-values { font-size: var(--fs-small); color: var(--text-muted); }
+  .mini-stat-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 16px;
+  }
+  .kpi-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .kpi-item__label { font-size: var(--fs-xxs); font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .kpi-item__value { font-size: 24px; font-weight: 800; color: var(--primary); }
+  .kpi-item__value--accent { color: var(--accent); }
+  .kpi-item__value--success { color: var(--success); }
+  .kpi-item__sub { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+  .oportunidad-row {
+    display: grid;
+    grid-template-columns: 1fr 140px 100px 100px 60px;
+    gap: 14px; align-items: center;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    transition: background 180ms;
+  }
+  .oportunidad-row:hover { background: var(--page-bg); }
+  .oportunidad-row:last-child { border-bottom: none; }
+  .lead-row {
+    display: grid;
+    grid-template-columns: 1fr 180px 140px 100px 60px;
+    gap: 14px; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    transition: background 180ms;
+  }
+  .lead-row:hover { background: var(--page-bg); }
+  .lead-row:last-child { border-bottom: none; }
+  .actividad-mini-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+  }
+  .actividad-mini-row:last-child { border-bottom: none; }
+  .actividad-mini-row__icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div><div class="app-shell" id="d"></div></div>
+
+<script src="../shared/components.js"></script>
+<script>
+function content(bp) {
+  const isMobile = bp === 'mobile';
+  const ejecutivo = {
+    id: 'USR-001',
+    nombre: 'Juan Pérez',
+    rol: 'Ejecutivo Comercial',
+    inicial: 'JP',
+    color: 1,
+    depto: 'Santander',
+    email: 'juan.perez@extrucol.com',
+    telefono: '+57 315 555 1234',
+    fechaIngreso: '15 Mar 2023',
+    estado: 'Activo',
+    tendencia: '▲ +12%',
+    tendenciaUp: true,
+    metricas: {
+      oportunidadesActivas: 12,
+      leadsGestionados: 8,
+      actividadesCompletadas: 47,
+      tasaConversion: 68,
+      valorPipeline: '$ 1.240 M',
+      ventasMes: '$ 385 M',
+      metaMes: '$ 350 M',
+      metaPct: 110,
+      cumplimiento: 85,
+      LeadsToOpp: 12,
+      OppCerradas: 5,
+      OppGanadas: 3,
+      OppPerdidas: 2,
+      tasaGanadas: 60
+    }
+  };
+
+  const metaColor = ejecutivo.metricas.metaPct >= 100 ? 'var(--success)' : ejecutivo.metricas.metaPct >= 80 ? 'var(--accent)' : 'var(--error)';
+
+  const oportunidades = [
+    { id: 'OPP-2025-0042', titulo: 'Proyecto acueducto rural - Piedecuesta', empresa: 'EMPAS S.A.', estado: 'Propuesta', badge: 'propuesta', valor: '$ 485 M', fecha: '25 Abr 2026' },
+    { id: 'OPP-2025-0038', titulo: 'Suministro anual Constructora Andina', empresa: 'Constructora Andina', estado: 'Negociación', badge: 'negociacion', valor: '$ 560 M', fecha: '30 Abr 2026' },
+    { id: 'OPP-2025-0035', titulo: 'Ampliación red gas', empresa: 'Hidrogas SA', estado: 'Calificación', badge: 'calificacion', valor: '$ 95 M', fecha: '15 May 2026' },
+    { id: 'OPP-2025-0028', titulo: 'Cotización tubería PE100', empresa: 'Distriaguas SAS', estado: 'Prospección', badge: 'prospecto', valor: '$ 45 M', fecha: '20 May 2026' },
+  ];
+
+  const leads = [
+    { id: 'LEAD-2026-0245', titulo: 'Consulta portafolio riego', empresa: 'Agroindustria Llanera', estado: 'Contactado', badge: 'propuesta', score: 65, dias: 2 },
+    { id: 'LEAD-2026-0242', titulo: 'Solicita cotización PE100', empresa: 'Constructora XYZ', estado: 'Nuevo', badge: 'prospecto', score: 48, dias: 1 },
+    { id: 'LEAD-2026-0238', titulo: 'Interesado en accesorios', empresa: 'Distribuidora del Sur', estado: 'Interesado', badge: 'calificacion', score: 72, dias: 3 },
+  ];
+
+  const actividadesRecientes = [
+    { tipo: 'visita', icon: 'mapPin', titulo: 'Visita técnica - EMPAS S.A.', fecha: 'Hoy 10:30 AM', estado: 'Completada' },
+    { tipo: 'llamada', icon: 'phone', titulo: 'Llamada seguimiento - Tecnoagua', fecha: 'Hoy 9:00 AM', estado: 'Completada' },
+    { tipo: 'email', icon: 'envelope', titulo: 'Envío cotización revisada', fecha: 'Ayer 3:20 PM', estado: 'Completada' },
+    { tipo: 'reunion', icon: 'view', titulo: 'Reunión virtual - Aguas del Valle', fecha: 'Mañana 3:00 PM', estado: 'Agendada' },
+  ];
+
+  const actividadIconClass = { visita: 'visita', llamada: 'llamada', email: 'email', reunion: 'reunion' };
+  const estadoActivityBadge = { Completada: 'ganada', Agendada: 'prospecto', Vencida: 'perdida' };
+
+  return `
+    <div class="content">
+      <a href="05-equipo-comercial.html" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-size: var(--fs-small); margin-bottom: 12px; cursor: pointer;">
+        ${Icons.chevronLeft} Volver al equipo
+      </a>
+
+      <div class="profile-header">
+        <div class="profile-header__row">
+          <div class="profile-avatar avatar--color-${ejecutivo.color}">${ejecutivo.inicial}</div>
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="profile-info__name">${ejecutivo.nombre}</div>
+              <span class="badge badge--ganada">Activo</span>
+            </div>
+            <div class="profile-info__role">${ejecutivo.rol}</div>
+            <div class="profile-info__depto">
+              ${Icons.mapPin.replace('class="icon"', 'class="icon icon--sm"')} ${ejecutivo.depto}
+              <span style="margin-left: 8px; color: ${ejecutivo.tendenciaUp ? 'var(--success)' : 'var(--error)'}; font-weight: 600; font-size: var(--fs-small);">
+                ${ejecutivo.tendencia} vs mes anterior
+              </span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
+            <button class="btn btn--ghost btn--sm">${Icons.bell} Notificar</button>
+          </div>
+        </div>
+        <div class="profile-meta">
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Email</span>
+            <span class="profile-meta__value">${ejecutivo.email}</span>
+          </div>
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Teléfono</span>
+            <span class="profile-meta__value">${ejecutivo.telefono}</span>
+          </div>
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Ingreso</span>
+            <span class="profile-meta__value">${ejecutivo.fechaIngreso}</span>
+          </div>
+          <div class="profile-meta__item">
+            <span class="profile-meta__label">Cumplimiento</span>
+            <span style="font-weight: 700; color: ${ejecutivo.metricas.cumplimiento >= 80 ? 'var(--success)' : 'var(--accent)'};">${ejecutivo.metricas.cumplimiento}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta-bar-container">
+        <div class="meta-bar-header">
+          <span class="meta-bar-title">Meta del mes</span>
+          <span class="meta-bar-values">${ejecutivo.metricas.ventasMes} / ${ejecutivo.metricas.metaMes}</span>
+        </div>
+        <div class="progress__bar" style="height: 10px;">
+          <div class="progress__fill" style="width: ${Math.min(ejecutivo.metricas.metaPct, 100)}%; background: ${metaColor};"></div>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-item">
+          <div class="kpi-item__label">Oportunidades activas</div>
+          <div class="kpi-item__value">${ejecutivo.metricas.oportunidadesActivas}</div>
+          <div class="kpi-item__sub">${ejecutivo.metricas.valorPipeline} en pipeline</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-item__label">Leads → Opp</div>
+          <div class="kpi-item__value kpi-item__value--success">${ejecutivo.metricas.tasaConversion}%</div>
+          <div class="kpi-item__sub">Conversión</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-item__label">Oportunidades ganadas</div>
+          <div class="kpi-item__value kpi-item__value--success">${ejecutivo.metricas.OppGanadas}</div>
+          <div class="kpi-item__sub">${ejecutivo.metricas.tasaGanadas}% tasa ganadas</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-item__label">Actividades completadas</div>
+          <div class="kpi-item__value">${ejecutivo.metricas.actividadesCompletadas}</div>
+          <div class="kpi-item__sub">Este mes</div>
+        </div>
+      </div>
+
+      <div style="display: grid; gap: 16px; ${isMobile ? '' : 'grid-template-columns: 1fr 1fr;'}">
+        <div class="card" style="padding: 0;">
+          <div class="card__header">
+            <div class="card__title">Oportunidades</div>
+            <span class="badge badge--info">${oportunidades.length}</span>
+          </div>
+          <div>
+            ${oportunidades.map(opp => `
+              <div class="oportunidad-row">
+                <div>
+                  <div style="font-weight: 600; color: var(--text-primary); font-size: var(--fs-label);">${opp.titulo}</div>
+                  <div style="font-size: var(--fs-small); color: var(--text-muted);">${opp.empresa}</div>
+                </div>
+                <div><span class="badge badge--${opp.badge}"><span class="dot"></span> ${opp.estado}</span></div>
+                <div style="font-weight: 700; color: var(--accent);">${opp.valor}</div>
+                <div style="font-size: var(--fs-small); color: var(--text-muted);">${opp.fecha}</div>
+                <a href="../ejecutivo/04-oportunidad-detalle.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">${Icons.chevronRight}</button></a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="card__header">
+            <div class="card__title">Leads</div>
+            <span class="badge badge--info">${leads.length}</span>
+          </div>
+          <div>
+            ${leads.map(lead => `
+              <div class="lead-row">
+                <div>
+                  <div style="font-weight: 600; color: var(--text-primary); font-size: var(--fs-label);">${lead.titulo}</div>
+                  <div style="font-size: var(--fs-small); color: var(--text-muted);">${lead.empresa}</div>
+                </div>
+                <div><span class="badge badge--${lead.badge}"><span class="dot"></span> ${lead.estado}</span></div>
+                <div style="display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--accent);">${Icons.fire.replace('class="icon"', 'class="icon icon--xs"')} ${lead.score}</div>
+                <div style="font-size: var(--fs-small); color: var(--text-muted);">${lead.dias}d</div>
+                <a href="../ejecutivo/04-oportunidad-detalle.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">${Icons.chevronRight}</button></a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0; margin-top: 16px;">
+        <div class="card__header">
+          <div class="card__title">Actividades recientes</div>
+          <a href="07-actividades.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver todas</button></a>
+        </div>
+        <div>
+          ${actividadesRecientes.map(act => `
+            <div class="actividad-mini-row">
+              <div class="actividad-mini-row__icon actividad-mini-row__icon--${actividadIconClass[act.tipo]}" style="background: ${act.tipo === 'visita' ? 'var(--accent-bg)' : act.tipo === 'llamada' ? 'var(--success-bg)' : act.tipo === 'email' ? '#F3E8FF' : 'var(--primary-bg)'}; color: ${act.tipo === 'visita' ? '#C7770D' : act.tipo === 'llamada' ? 'var(--success)' : act.tipo === 'email' ? '#7C3AED' : 'var(--primary)'};">
+                ${Icons[act.icon]}
+              </div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; color: var(--text-primary); font-size: var(--fs-label);">${act.titulo}</div>
+                <div style="font-size: var(--fs-small); color: var(--text-muted);">${act.fecha}</div>
+              </div>
+              <span class="badge badge--${estadoActivityBadge[act.estado]}"><span class="dot"></span> ${act.estado}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('d').innerHTML = `${renderSidebar('equipo', 'director')}<div class="main-area">${renderTopbar({breadcrumb: ['Equipo comercial', 'Perfil']})}${content('desktop')}</div>`;
+</script>
+</body>
+</html>

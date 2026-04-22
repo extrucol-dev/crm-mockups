@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Coordinador · Alertas</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .alerta-card {
+    display: flex; gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 180ms;
+  }
+  .alerta-card:hover { background: var(--page-bg); }
+  .alerta-card:last-child { border-bottom: none; }
+  .alerta-card__icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .alerta-card__icon--error { background: var(--error-bg); color: var(--error); }
+  .alerta-card__icon--warning { background: #FFF8E5; color: #B87E15; }
+  .alerta-card__icon--info { background: var(--primary-bg); color: var(--primary); }
+  .alerta-card__icon--success { background: var(--success-bg); color: var(--success); }
+  .alerta-card__body { flex: 1; min-width: 0; }
+  .alerta-card__title { font-weight: 600; color: var(--text-primary); font-size: var(--fs-label); margin-bottom: 2px; }
+  .alerta-card__desc { font-size: var(--fs-small); color: var(--text-muted); margin-bottom: 6px; }
+  .alerta-card__meta { display: flex; gap: 12px; font-size: var(--fs-xs); color: var(--text-disabled); flex-wrap: wrap; }
+  .alerta-card__actions { display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start; }
+  .alerta-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700;
+  }
+  .alerta-badge--critical { background: var(--error-bg); color: var(--error); }
+  .alerta-badge--warning { background: #FFF8E5; color: #B87E15; }
+  .alerta-badge--info { background: var(--primary-bg); color: var(--primary); }
+  .notif-channel {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 600;
+  }
+  .notif-channel--email { background: var(--primary-bg); color: var(--primary); }
+  .notif-channel--push { background: var(--accent-bg); color: #C7770D; }
+  .notif-channel--sms { background: #F3E8FF; color: #7C3AED; }
+</style>
+</head>
+<body>
+<div><div class="app-shell" id="d"></div></div>
+
+<script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
+<script>
+window.onCRMDataLoaded = function(crm) {
+  const alertasData = crm.data.leads.filter(l => l.estado === 'No Interesado' || l.estado === 'Nuevo').map((l, i) => ({
+    id: i + 1,
+    tipo: l.estado === 'No Interesado' ? 'error' : 'warning',
+    prioridad: l.estado === 'No Interesado' ? 'critical' : 'warning',
+    titulo: l.estado === 'No Interesado' ? `Lead no interesado: ${l.nombre}` : `Lead sin contactar: ${l.nombre}`,
+    descripcion: `${l.empresa} · ${l.ciudad} · Asignado a ${l.asesor}`,
+    ejecutivo: l.asesor,
+    entidad: 'LEAD',
+    entidadId: l.id,
+    dias: parseInt(crm.getDaysAgo(l.fecha_creacion)) || 3,
+    umbral: 3,
+    canales: ['email'],
+    timestamp: crm.formatDate(l.fecha_creacion),
+    acciones: ['ir_detalle', 'reasignar', 'atendida']
+  }));
+
+function renderCanalBadge(canal) {
+  const iconos = { email: Icons.envelope, push: Icons.bell, sms: Icons.phone };
+  return `<span class="notif-channel notif-channel--${canal}">${iconos[canal] || ''}${canal.toUpperCase()}</span>`;
+}
+
+function renderAlertCard(a) {
+  const tipoClases = { error: 'error', warning: 'warning', info: 'info' };
+  const prioridadLabels = { critical: 'Crítica', warning: 'Advertencia', info: 'Información' };
+
+  const acciones = a.acciones.map(acc => {
+    if (acc === 'ir_detalle') return `<button class="btn btn--ghost btn--sm">${Icons.view} Ver</button>`;
+    if (acc === 'reasignar') return `<button class="btn btn--ghost btn--sm">${Icons.users} Reasignar</button>`;
+    if (acc === 'atendida') return `<button class="btn btn--ghost btn--sm" style="color: var(--success);">${Icons.check} Atendida</button>`;
+    if (acc === 'completar') return `<button class="btn btn--ghost btn--sm" style="color: var(--success);">${Icons.check} Completar</button>`;
+    if (acc === 'ver_ejecutivo') return `<button class="btn btn--ghost btn--sm">${Icons.user} Ver perfil</button>`;
+    if (acc === 'notificar') return `<button class="btn btn--ghost btn--sm">${Icons.bell} Notificar</button>`;
+    return '';
+  }).join('');
+
+  return `
+    <div class="alerta-card">
+      <div class="alerta-card__icon alerta-card__icon--${a.tipo}">${Icons[a.tipo === 'error' ? 'warning' : a.tipo === 'warning' ? 'clock' : 'bell']}</div>
+      <div class="alerta-card__body">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+          <span class="alerta-card__title">${a.titulo}</span>
+          <span class="alerta-badge alerta-badge--${a.prioridad}">${Icons[a.prioridad === 'critical' ? 'warning' : 'clock'].replace('class="icon"', 'class="icon icon--xs"')} ${prioridadLabels[a.prioridad]}</span>
+          <span class="badge badge--${a.entidad === 'OPP' ? 'accent' : 'info'}" style="font-size: 10px;">${a.entidad}</span>
+        </div>
+        <div class="alerta-card__desc">${a.descripcion}</div>
+        <div class="alerta-card__meta">
+          <span>${Icons.user.replace('class="icon"', 'class="icon icon--xs"')} ${a.ejecutivo}</span>
+          ${a.dias > 0 ? `<span>${Icons.clock.replace('class="icon"', 'class="icon icon--xs"')} ${a.dias} día${a.dias > 1 ? 's' : ''}</span>` : ''}
+          <span>${Icons.clock.replace('class="icon"', 'class="icon icon--xs"')} ${a.timestamp}</span>
+          ${a.canales.map(renderCanalBadge).join('')}
+        </div>
+      </div>
+      <div class="alerta-card__actions">
+        ${acciones}
+      </div>
+    </div>
+  `;
+}
+
+function content(bp) {
+  const isMobile = bp === 'mobile';
+
+  const criticas = alertasData.filter(a => a.prioridad === 'critical');
+  const advertencias = alertasData.filter(a => a.prioridad === 'warning');
+
+  return `
+    <div class="content">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Alertas activas</div>
+          <div class="page-head__subtitle">${alertasData.length} alertas · ${criticas.length} críticas · ${advertencias.length} advertencias</div>
+        </div>
+        <div class="page-head__actions">
+          <select class="select" style="max-width: 160px;">
+            <option>Todas las alertas</option>
+            <option>Solo críticas</option>
+            <option>Solo advertencias</option>
+          </select>
+          <button class="btn btn--secondary btn--sm">${Icons.download} Exportar</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(${bp === 'desktop' ? 4 : 2}, 1fr); gap: 12px; margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-card__icon" style="background: var(--error-bg); color: var(--error);">${Icons.warning}</div>
+          <div class="stat-card__label">Alertas críticas</div>
+          <div class="stat-card__value" style="color: var(--error);">${criticas.length}</div>
+          <div class="stat-card__subtext">Requieren acción inmediata</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--accent">${Icons.clock}</div>
+          <div class="stat-card__label">Advertencias</div>
+          <div class="stat-card__value stat-card__value--accent">${advertencias.length}</div>
+          <div class="stat-card__subtext">Cerca del umbral</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon">${Icons.users}</div>
+          <div class="stat-card__label">Ejecutivos afectados</div>
+          <div class="stat-card__value">${new Set(alertasData.filter(a => a.ejecutivo !== 'Varios').map(a => a.ejecutivo)).size}</div>
+          <div class="stat-card__subtext">De 6 ejecutivos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--success">${Icons.check}</div>
+          <div class="stat-card__label">Resueltas esta semana</div>
+          <div class="stat-card__value stat-card__value--success">12</div>
+          <div class="stat-card__subtext">-3 vs semana anterior</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <a class="tab is-active">Todas <span class="tab__count">${alertasData.length}</span></a>
+        <a class="tab">Críticas <span class="tab__count" style="background: var(--error-bg); color: var(--error);">${criticas.length}</span></a>
+        <a class="tab">Advertencias <span class="tab__count" style="background: #FFF8E5; color: #B87E15;">${advertencias.length}</span></a>
+      </div>
+
+      <div class="filter-bar">
+        <div class="input-wrapper" style="flex:1; max-width: 320px;">
+          ${Icons.search}
+          <input class="input input--with-icon" placeholder="Buscar alerta...">
+        </div>
+        ${!isMobile ? `
+          <select class="select" style="max-width: 160px;">
+            <option>Todos los tipos</option>
+            <option>Leads estancados</option>
+            <option>Oportunidades</option>
+            <option>Actividades</option>
+          </select>
+          <select class="select" style="max-width: 180px;">
+            <option>Todos los ejecutivos</option>
+          </select>
+        ` : ''}
+      </div>
+
+      <div class="card" style="padding: 0;">
+        ${alertasData.map(renderAlertCard).join('')}
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('d').innerHTML = `${renderSidebar('alertas', 'coordinador')}<div class="main-area">${renderTopbar({title:'Alertas activas'})}${content('desktop')}</div>`;
+};
+</script>
+</body>
+</html>

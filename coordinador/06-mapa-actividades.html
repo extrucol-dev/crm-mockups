@@ -239,7 +239,7 @@ function monitoreoContent(bp) {
                   <td style="text-align: center; color: ${e.estancados > 2 ? 'var(--error)' : e.estancados > 0 ? 'var(--accent)' : 'var(--text-muted)'}; font-weight: 700;">${e.estancados}</td>
                   <td style="text-align: center; color: ${e.sinActividad > 2 ? 'var(--error)' : e.sinActividad > 0 ? 'var(--accent)' : 'var(--text-muted)'}; font-weight: 700;">${e.sinActividad}</td>
                   <td><span class="badge badge--${badgeByEstado[e.estado]}"><span class="dot"></span> ${labelByEstado[e.estado]}</span></td>
-                  <td><button class="table__action">${Icons.view}</button></td>
+                  <td><a href="09-perfil-ejecutivo.html" style="text-decoration:none;"><button class="table__action">${Icons.view}</button></a></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -346,10 +346,7 @@ function mapaContent(bp) {
             <div class="card__title">Visitas recientes</div>
             <div class="card__subtitle">Últimas 5 visitas registradas con GPS</div>
           </div>
-          <a href="07-actividades.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-            <button class="btn btn--ghost btn--sm">Ver todas ${Icons.arrowRight}</button>
-          </a>
-
+          <a href="07-actividades.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver todas ${Icons.arrowRight}</button></a>
         </div>
         <div style="padding: 0;">
           ${[
@@ -369,7 +366,7 @@ function mapaContent(bp) {
                   ${v.time}
                 </div>
               </div>
-              <button class="btn btn--ghost btn--sm">${Icons.view}</button>
+<a href="07-actividades.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">${Icons.view}</button></a>
             </div>
           `).join('')}
         </div>

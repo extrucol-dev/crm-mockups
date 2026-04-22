@@ -2,214 +2,220 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRM Extrucol · Ejecutivo · Formularios</title>
+<title>CRM Extrucol · Ejecutivo · Nueva Oportunidad</title>
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
-  .bp-col { display: flex; flex-direction: column; }
-  .form-card {
-    max-width: 672px; margin: 0 auto;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; box-shadow: var(--shadow-sm);
-  }
-  .form-section {
-    padding: 20px 24px; border-bottom: 1px solid var(--border);
-  }
-  .form-section:last-child { border-bottom: none; }
-  .form-section__title {
-    font-size: 13px; font-weight: 700; color: var(--text-primary);
-    text-transform: uppercase; letter-spacing: 0.04em;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .form-section__title .icon { color: var(--primary); }
-  .form-grid-2 {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
-  }
-  .form-grid-full { grid-column: 1 / -1; }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
+
+.form-card { max-width: 672px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); }
+.form-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.form-section:last-child { border-bottom: none; }
+.form-section__title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.form-section__title .icon { color: var(--primary); }
+.form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.form-grid-full { grid-column: 1 / -1; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field__label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+.form-field__hint { font-size: 11px; color: var(--text-muted); }
+.req { color: var(--error); }
+
+.product-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--page-bg); border-radius: 6px;
+}
+.product-item__info { flex: 1; }
+.product-item__name { font-weight: 600; font-size: 13px; }
+.product-item__meta { font-size: 11.5px; color: var(--text-muted); }
 </style>
 </head>
 <body>
-<div>
-  <div>
-
-    <div>
-      <div>
-        <div><div class="app-shell" id="desktop-shell"></div></div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isMobile = bp === 'mobile';
-  const gridCols = isMobile ? '1fr' : 'repeat(2, 1fr)';
+const currentUser = 'PAOLA';
+let form = { nombre: '', empresa: '', contacto: '', valor: '', fecha_cierre: '', estado: 'Calificacion', origen: 'WHATSAPP' };
+let productosSeleccionados = [];
 
-  const formHTML = `
-    <div class="form-card">
-      <div class="form-section">
-        <div class="form-section__title">${Icons.briefcase} Información básica</div>
-        <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
-          <div class="form-field form-grid-full">
-            <label class="form-field__label">Título de la oportunidad <span class="req">*</span></label>
-            <input class="input" value="Proyecto acueducto rural - Piedecuesta" />
-            <span class="form-field__hint">Describe brevemente la oportunidad de negocio</span>
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Tipo de oportunidad <span class="req">*</span></label>
-            <select class="select">
-              <option>Licitación pública</option>
-              <option>Suministro directo</option>
-              <option>Proyecto a medida</option>
-              <option>Contrato marco</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Sector <span class="req">*</span></label>
-            <select class="select">
-              <option>Agua potable</option>
-              <option>Gas natural</option>
-              <option>Agricultura / Riego</option>
-              <option>Industria</option>
-            </select>
-          </div>
-          <div class="form-field form-grid-full">
-            <label class="form-field__label">Descripción</label>
-            <textarea class="textarea" rows="3">Construcción de red de distribución de agua potable para zona rural de Piedecuesta, fase 1 - conducción principal 3km.</textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section__title">${Icons.building} Empresa y contacto</div>
-        <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
-          <div class="form-field form-grid-full">
-            <label class="form-field__label">Empresa <span class="req">*</span></label>
-            <div class="input-wrapper">
-              ${Icons.search}
-              <input class="input input--with-icon" value="EMPAS S.A." />
-            </div>
-            <span class="form-field__hint">Busca una empresa existente o crea una nueva</span>
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Contacto asignado</label>
-            <select class="select">
-              <option>Andrés Rodríguez — Gerente de Proyectos</option>
-              <option>María López — Compradora</option>
-              <option>+ Nuevo contacto</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Lead de origen</label>
-            <select class="select">
-              <option>Lead #124 - Proyecto acueducto rural</option>
-              <option>Sin lead de origen</option>
-            </select>
-            <span class="form-field__hint">Se usa para medir conversión</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section__title">${Icons.currency} Valores y fechas</div>
-        <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
-          <div class="form-field">
-            <label class="form-field__label">Valor estimado (COP) <span class="req">*</span></label>
-            <input class="input" value="$ 485.000.000" />
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Fecha estimada de cierre <span class="req">*</span></label>
-            <input class="input" type="date" value="2026-04-25" />
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Probabilidad de cierre</label>
-            <input class="input" value="65" />
-            <span class="form-field__hint">Porcentaje estimado (0-100)</span>
-          </div>
-          <div class="form-field">
-            <label class="form-field__label">Estado inicial</label>
-            <select class="select">
-              <option>Prospección</option>
-              <option selected>Calificación</option>
-              <option>Propuesta</option>
-              <option>Negociación</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section__title">${Icons.archive} Productos asociados</div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--page-bg); border-radius: 6px;">
-            <div style="flex:1;">
-              <div style="font-weight:600; font-size: 13px;">Tubería PE100 SDR 11 - 4"</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Agregado al listado</div>
-            </div>
-            <button class="topbar__icon-btn" style="color: var(--error);">${Icons.trash}</button>
-          </div>
-          <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--page-bg); border-radius: 6px;">
-            <div style="flex:1;">
-              <div style="font-weight:600; font-size: 13px;">Accesorios electrofusión 4"</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Agregado al listado</div>
-            </div>
-            <button class="topbar__icon-btn" style="color: var(--error);">${Icons.trash}</button>
-          </div>
-          <button class="btn btn--secondary btn--block" style="border-style: dashed;">${Icons.plus} Agregar producto</button>
-        </div>
-      </div>
-
-      <div class="form-section" style="background: var(--page-bg);">
-        <div class="form-actions" style="border-top: none; padding-top: 0; margin-top: 0;">
-          <button class="btn btn--secondary">Cancelar</button>
-          <button class="btn btn--primary">${Icons.check} Guardar oportunidad</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  return `
-    <div class="content">
-      ${!isMobile ? `
-        <div class="page-head">
-          <div class="page-head__title-group">
-            <div class="page-head__title">Nueva oportunidad</div>
-            <div class="page-head__subtitle">Completa los datos para crear una nueva oportunidad comercial</div>
-          </div>
-        </div>
-      ` : ''}
-      ${formHTML}
-    </div>
-  `;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast is-' + type;
+  t.style.display = 'flex';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
 
-document.getElementById('desktop-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ breadcrumb: ['Oportunidades', 'Nueva'] })}
-    ${content('desktop')}
-  </div>
-`;
-document.getElementById('tablet-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ breadcrumb: ['Oportunidades', 'Nueva'] })}
-    ${content('tablet')}
-  </div>
-`;
-document.getElementById('mobile-shell').innerHTML = `
-  <div class="main-area">
-    ${renderTopbar({ title: 'Nueva oportunidad', actions: `<button class="topbar__icon-btn">${Icons.close}</button>` })}
-    ${content('mobile')}
-  </div>
-`;
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+window.onCRMDataLoaded = function(crm) {
+  const productos = crm.data.productos || [];
+  const leads = crm.data.leads.filter(l => l.asesor === currentUser);
+  const empresas = crm.data.empresas || [];
+  const today = new Date(); today.setMonth(today.getMonth() + 3);
+  const defaultCierre = today.toISOString().split('T')[0];
+
+  function renderForm() {
+    const productoRows = productosSeleccionados.map((p, i) => `
+    <div class="product-item">
+      <div class="product-item__info">
+        <div class="product-item__name">${esc(p.nombre)}</div>
+        <div class="product-item__meta">${p.cantidad} x ${crm.formatCurrency(p.precio_unitario)} = ${crm.formatCurrency(p.subtotal)}</div>
+      </div>
+      <button class="topbar__icon-btn" style="color:var(--error);" onclick="removeProduct(${i})">${Icons.trash}</button>
+    </div>`).join('');
+
+    return `
+    <div class="content" style="padding-top: 16px;">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Nueva oportunidad</div>
+          <div class="page-head__subtitle">Completa los datos para crear una oportunidad comercial</div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-section">
+          <div class="form-section__title">${Icons.briefcase} Informacion basica</div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-field form-grid-full">
+              <label class="form-field__label">Titulo de la oportunidad <span class="req">*</span></label>
+              <input class="input" id="f-nombre" value="${esc(form.nombre)}" oninput="form.nombre=this.value" placeholder="Nombre del proyecto o oportunidad" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-field">
+                <label class="form-field__label">Empresa</label>
+                <input class="input" id="f-empresa" value="${esc(form.empresa)}" oninput="form.empresa=this.value" placeholder="Nombre de la empresa" list="empresas-list" />
+                <datalist id="empresas-list">${empresas.slice(0,10).map(e => `<option value="${esc(e.nombre)}">`).join('')}</datalist>
+              </div>
+              <div class="form-field">
+                <label class="form-field__label">Contacto</label>
+                <input class="input" id="f-contacto" value="${esc(form.contacto)}" oninput="form.contacto=this.value" placeholder="Nombre del contacto" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section__title">${Icons.currency} Valores y fechas</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-field">
+              <label class="form-field__label">Valor estimado (COP) <span class="req">*</span></label>
+              <input class="input" type="number" id="f-valor" value="${form.valor}" oninput="form.valor=this.value" placeholder="0" />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Fecha cierre estimada <span class="req">*</span></label>
+              <input class="input" type="date" id="f-cierre" value="${form.fecha_cierre || defaultCierre}" oninput="form.fecha_cierre=this.value" />
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Estado inicial</label>
+              <select class="select" id="f-estado" onchange="form.estado=this.value" style="width:100%;">
+                <option value="Prospeccion" ${form.estado==='Prospeccion'?'selected':''}>Prospeccion</option>
+                <option value="Calificacion" ${form.estado==='Calificacion'?'selected':''}>Calificacion</option>
+                <option value="Propuesta" ${form.estado==='Propuesta'?'selected':''}>Propuesta</option>
+                <option value="Negociacion" ${form.estado==='Negociacion'?'selected':''}>Negociacion</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Lead de origen (opcional)</label>
+              <select class="select" id="f-lead" style="width:100%;">
+                <option value="">Sin lead de origen</option>
+                ${leads.map(l => `<option value="${l.id}">${l.id} - ${l.nombre} (${l.empresa})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section__title">${Icons.archive} Productos asociados</div>
+          ${productoRows ? `<div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">${productoRows}</div>` : ''}
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <select class="select" id="prod-nombre" style="width:100%;">
+              <option value="">Producto...</option>
+              ${productos.map(p => `<option value="${p.id}" data-precio="${p.precio_base}" data-nombre="${p.nombre}">${p.nombre} - ${crm.formatCurrency(p.precio_base)}</option>`).join('')}
+            </select>
+            <input class="input" type="number" id="prod-cantidad" value="1" min="1" placeholder="Cantidad" />
+            <input class="input" type="number" id="prod-precio" placeholder="Precio unitario" />
+          </div>
+          <button class="btn btn--secondary btn--sm" style="align-self: flex-start; margin-top: 8px;" onclick="agregarProducto()">${Icons.plus} Agregar producto</button>
+        </div>
+
+        <div class="form-section" style="background: var(--page-bg);">
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <a href="02-oportunidades-kanban.html" style="text-decoration:none;">
+              <button class="btn btn--secondary">Cancelar</button>
+            </a>
+            <button class="btn btn--primary" onclick="guardarOportunidad()">${Icons.check} Guardar oportunidad</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function agregarProducto() {
+    const select = document.getElementById('prod-nombre');
+    const opt = select.selectedOptions[0];
+    const cantidad = parseInt(document.getElementById('prod-cantidad').value) || 1;
+    const precio = parseInt(document.getElementById('prod-precio').value) || parseInt(opt?.dataset?.precio) || 0;
+    const nombre = opt?.dataset?.nombre || opt?.text || '';
+    if (!nombre) { showToast('Selecciona un producto', 'error'); return; }
+    if (precio <= 0) { showToast('Precio invalido', 'error'); return; }
+    productosSeleccionados.push({ nombre, cantidad, precio_unitario: precio, subtotal: cantidad * precio });
+    form.valor = String(productosSeleccionados.reduce((s, p) => s + p.subtotal, 0));
+    document.getElementById('prod-cantidad').value = '1';
+    document.getElementById('prod-precio').value = '';
+    select.selectedIndex = 0;
+    renderAll();
+  }
+
+  function removeProduct(idx) {
+    productosSeleccionados.splice(idx, 1);
+    form.valor = String(productosSeleccionados.reduce((s, p) => s + p.subtotal, 0));
+    renderAll();
+  }
+
+  function guardarOportunidad() {
+    if (!form.nombre.trim()) { showToast('El titulo es obligatorio', 'error'); return; }
+    if (!form.valor || parseInt(form.valor) <= 0) { showToast('El valor debe ser mayor a 0', 'error'); return; }
+    const leadId = document.getElementById('f-lead')?.value || null;
+    const opp = crm.addOportunidad({
+      nombre: form.nombre.trim(),
+      empresa: form.empresa.trim(),
+      lead_id: leadId,
+      contacto: form.contacto.trim(),
+      estado: form.estado,
+      valor: parseInt(form.valor) || 0,
+      fecha_cierre: form.fecha_cierre || '',
+      origen: form.origen,
+      asesor: currentUser
+    });
+    if (!opp) { showToast('Error al guardar', 'error'); return; }
+    productosSeleccionados.forEach(p => crm.addProductoOportunidad(opp.id, p));
+    crm.recalculateMetricas();
+    showToast('Oportunidad creada: ' + opp.id, 'success');
+    setTimeout(() => { window.location.href = '04-oportunidad-detalle.html?id=' + opp.id; }, 1500);
+  }
+
+  function renderAll() {
+    document.getElementById('desktop-shell').innerHTML =
+      renderSidebar('oportunidades', 'ejecutivo') +
+      '<div class="main-area">' +
+        renderTopbar({ breadcrumb: ['Oportunidades', 'Nueva'] }) +
+        renderForm() +
+      '</div>';
+  }
+
+  renderAll();
+};
 </script>
 </body>
 </html>

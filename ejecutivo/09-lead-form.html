@@ -6,116 +6,155 @@
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
-  .bp-col { display: flex; flex-direction: column; }
+.form-card { max-width: 672px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); }
+.form-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.form-section:last-child { border-bottom: none; }
+.form-section__title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.form-section__title .icon { color: var(--primary); }
 
-  .form-card { max-width: 672px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); }
-  .form-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
-  .form-section:last-child { border-bottom: none; }
-  .form-section__title { font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .form-section__title .icon { color: var(--primary); }
-  .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .form-grid-full { grid-column: 1 / -1; }
+.interes-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--border-input);
+  background: var(--surface); font-size: 12.5px;
+  font-weight: 600; color: var(--text-secondary);
+  cursor: pointer; transition: all 180ms; user-select: none;
+}
+.interes-chip:hover { border-color: var(--primary); }
+.interes-chip.is-selected { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
+.interes-chip.is-selected::before { content: '✓ '; font-weight: 700; }
 
-  .interes-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 12px; border-radius: 999px;
-    border: 1px solid var(--border-input);
-    background: var(--surface); font-size: 12.5px;
-    font-weight: 600; color: var(--text-secondary);
-    cursor: pointer; transition: all 180ms;
-  }
-  .interes-chip:hover { border-color: var(--primary); }
-  .interes-chip.is-selected { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
-  .interes-chip.is-selected::before { content: '✓'; font-weight: 700; }
+.origen-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 10px; border-radius: 8px;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 180ms; text-align: center; user-select: none;
+}
+.origen-option:hover { border-color: var(--primary); background: var(--primary-bg); }
+.origen-option.is-selected { border-color: var(--primary); background: var(--primary-bg); }
+.origen-option__icon { width: 32px; height: 32px; border-radius: 8px; background: var(--page-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+.origen-option.is-selected .origen-option__icon { background: var(--primary); color: #fff; }
+.origen-option__label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
+.origen-option.is-selected .origen-option__label { color: var(--primary); }
 
-  .origen-option {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    padding: 14px 10px; border-radius: 8px;
-    border: 1px solid var(--border); cursor: pointer;
-    transition: all 180ms; text-align: center;
-  }
-  .origen-option:hover { border-color: var(--primary); background: var(--primary-bg); }
-  .origen-option.is-selected { border-color: var(--primary); background: var(--primary-bg); }
-  .origen-option__icon {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: var(--page-bg); color: var(--text-muted);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .origen-option.is-selected .origen-option__icon { background: var(--primary); color: #fff; }
-  .origen-option__label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
-  .origen-option.is-selected .origen-option__label { color: var(--primary); }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
 </style>
 </head>
 <body>
-<div>
-  <div>
-    <div>
-      <div><div><div class="app-shell" id="d"></div></div></div>
-    </div>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isMobile = bp === 'mobile';
-  const gridCols = isMobile ? '1fr' : 'repeat(2, 1fr)';
+const currentUser = 'PAOLA';
 
-  const origenes = [
-    { icon: 'globe', label: 'Página Web', sel: true },
-    { icon: 'phone', label: 'Llamada' },
-    { icon: 'envelope', label: 'Email' },
-    { icon: 'users', label: 'Referido' },
-    { icon: 'chartBar', label: 'Facebook' },
-    { icon: 'sparkles', label: 'Instagram' },
-    { icon: 'clipboard', label: 'WhatsApp' },
-    { icon: 'briefcase', label: 'Licitación' },
-  ];
+const ORIGENES = [
+  { key: 'WHATSAPP', label: 'WhatsApp', icon: 'phone' },
+  { key: 'INSTAGRAM', label: 'Instagram', icon: 'sparkles' },
+  { key: 'FACEBOOK', label: 'Facebook', icon: 'chartBar' },
+  { key: 'LLAMADA', label: 'Llamada', icon: 'phone' },
+  { key: 'EMAIL', label: 'Email', icon: 'envelope' },
+  { key: 'REFERIDO', label: 'Referido', icon: 'users' },
+  { key: 'WEB', label: 'Pagina Web', icon: 'globe' },
+  { key: 'LICITACION', label: 'Licitacion', icon: 'briefcase' },
+];
 
-  const intereses = [
-    { label: 'Tubería PE100', sel: true },
-    { label: 'Sistema de riego', sel: true },
-    { label: 'Accesorios PE' },
-    { label: 'Asesoría técnica', sel: false },
-    { label: 'Válvulas y fittings' },
-    { label: 'Tubería CPVC' },
-    { label: 'Instalación' },
-    { label: 'Mantenimiento' },
-  ];
+const INTERESES_DISPONIBLES = ['TUBERIA', 'EQUIPOS', 'ACCESORIOS/MEDIDORES', 'TUBERIA HDPE', 'TUBERIA Y ACCESORIOS'];
+const CIUDADES = ['CARTAGENA','BUCARAMANGA','MEDELLIN','CALI','PEREIRA','BARRANQUILLA','QUIBDO','APARTADO','ITAGUI','LA CEJA','PACORA','TOCANCIPA','SABANA LARGA','MAGANGUE','TURBACO','LA DORADA','CORDOBA','DOSQUEBRADAS','SUCRE'];
 
-  return `
-    <div class="content">
+let formState = {
+  nombre: '', empresa: '', email: '', telefono: '',
+  ciudad: '', origen: 'WHATSAPP', intereses: [],
+  estado: 'Nuevo', comentarios: ''
+};
 
-        <div class="page-head">
-          <div class="page-head__title-group">
-            <div class="page-head__title">Nuevo Lead</div>
-            <div class="page-head__subtitle">Registra un prospecto y sus intereses comerciales</div>
-          </div>
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast is-' + type;
+  toast.style.display = 'flex';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+window.toggleInteres = function(label) {
+  if (formState.intereses.includes(label)) {
+    formState.intereses = formState.intereses.filter(i => i !== label);
+  } else {
+    formState.intereses.push(label);
+  }
+  renderAll();
+}
+
+window.onCRMDataLoaded = function(crm) {
+
+  window.renderAll = function() {
+    document.getElementById('desktop-shell').innerHTML =
+      renderSidebar('leads', 'ejecutivo') +
+      '<div class="main-area">' +
+        renderTopbar({ breadcrumb: ['Leads', 'Nuevo'] }) +
+        renderForm() +
+      '</div>';
+  }
+
+  function renderForm() {
+    return `
+    <div class="content" style="padding-top: 16px;">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Nuevo Lead</div>
+          <div class="page-head__subtitle">Registra un prospecto y sus intereses comerciales</div>
         </div>
+      </div>
+
       <div class="form-card">
         <div class="form-section">
-          <div class="form-section__title">${Icons.funnel} Información básica</div>
-          <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
-            <div class="form-field form-grid-full">
-              <label class="form-field__label">Título del lead <span class="req">*</span></label>
-              <input class="input" value="Consulta portafolio sistema de riego" />
-              <span class="form-field__hint">Un resumen breve de la necesidad del prospecto</span>
+          <div class="form-section__title">${Icons.funnel} Informacion basica</div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-field">
+              <label class="form-field__label">Nombre completo <span style="color:var(--error)">*</span></label>
+              <input class="input" id="f-nombre" placeholder="Nombre del contacto" value="${escHtml(formState.nombre)}" oninput="formState.nombre=this.value" />
             </div>
-            <div class="form-field form-grid-full">
-              <label class="form-field__label">Descripción</label>
-              <textarea class="textarea" rows="3">Cliente interesado en conocer opciones de riego por goteo para cultivo de 30 hectáreas. Solicita visita técnica y cotización preliminar.</textarea>
+            <div class="form-field">
+              <label class="form-field__label">Empresa</label>
+              <input class="input" id="f-empresa" placeholder="Nombre de la empresa o entidad" value="${escHtml(formState.empresa)}" oninput="formState.empresa=this.value" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-field">
+                <label class="form-field__label">Email</label>
+                <input class="input" type="email" id="f-email" placeholder="contacto@empresa.com" value="${escHtml(formState.email)}" oninput="formState.email=this.value" />
+              </div>
+              <div class="form-field">
+                <label class="form-field__label">Telefono</label>
+                <input class="input" id="f-telefono" placeholder="+57 300 000 0000" value="${escHtml(formState.telefono)}" oninput="formState.telefono=this.value" />
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label">Ciudad</label>
+              <select class="select" id="f-ciudad" onchange="formState.ciudad=this.value" style="width: 100%;">
+                <option value="">Seleccionar ciudad...</option>
+                ${CIUDADES.map(c => `<option value="${c}" ${formState.ciudad === c ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
             </div>
           </div>
         </div>
 
         <div class="form-section">
           <div class="form-section__title">${Icons.globe} Origen del lead</div>
-          <div style="display: grid; grid-template-columns: repeat(${isMobile ? 2 : 4}, 1fr); gap: 8px;">
-            ${origenes.map(o => `
-              <div class="origen-option ${o.sel ? 'is-selected' : ''}">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            ${ORIGENES.map(o => `
+              <div class="origen-option ${formState.origen === o.key ? 'is-selected' : ''}" data-origen="${o.key}" onclick="formState.origen='${o.key}';renderAll()">
                 <div class="origen-option__icon">${Icons[o.icon]}</div>
                 <div class="origen-option__label">${o.label}</div>
               </div>
@@ -124,56 +163,58 @@ function content(bp) {
         </div>
 
         <div class="form-section">
-          <div class="form-section__title">${Icons.building} Empresa y contacto</div>
-          <div class="form-grid-2" style="grid-template-columns: ${gridCols};">
-            <div class="form-field">
-              <label class="form-field__label">Empresa</label>
-              <div class="input-wrapper">
-                ${Icons.search}
-                <input class="input input--with-icon" value="Agroindustria Llanera" />
-              </div>
-              <span class="form-field__hint">Opcional · si ya existe</span>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Contacto</label>
-              <div class="input-wrapper">
-                ${Icons.search}
-                <input class="input input--with-icon" placeholder="Buscar o crear contacto" />
-              </div>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Email del contacto</label>
-              <input class="input" type="email" placeholder="cliente@empresa.com" value="contacto@agrollanera.co" />
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Teléfono</label>
-              <input class="input" placeholder="+57 300 000 0000" value="+57 315 678 9012" />
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
           <div class="form-section__title">${Icons.tag} Intereses</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Selecciona todos los productos o servicios de interés del lead</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Selecciona todos los productos de interes</div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            ${intereses.map(i => `
-              <span class="interes-chip ${i.sel ? 'is-selected' : ''}">${i.label}</span>
+            ${INTERESES_DISPONIBLES.map(i => `
+              <span class="interes-chip ${formState.intereses.includes(i) ? 'is-selected' : ''}" data-label="${i}" onclick="toggleInteres('${i}')">${i}</span>
             `).join('')}
           </div>
         </div>
 
+        <div class="form-section">
+          <div class="form-section__title">${Icons.clipboard} Notas iniciales</div>
+          <div class="form-field">
+            <label class="form-field__label">Primer comentario (opcional)</label>
+            <textarea class="textarea" id="f-comentarios" rows="3" placeholder="Describe brevemente la necesidad del prospecto..." oninput="formState.comentarios=this.value">${escHtml(formState.comentarios)}</textarea>
+          </div>
+        </div>
+
         <div class="form-section" style="background: var(--page-bg);">
-          <div class="form-actions" style="border-top: none; padding-top: 0; margin-top: 0;">
-            <button class="btn btn--secondary">Cancelar</button>
-            <button class="btn btn--primary">${Icons.check} Guardar lead</button>
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <a href="03-leads-kanban.html" style="text-decoration:none;">
+              <button class="btn btn--secondary">Cancelar</button>
+            </a>
+            <button class="btn btn--primary" onclick="guardarLead()">${Icons.check} Guardar lead</button>
           </div>
         </div>
       </div>
-    </div>
-  `;
-}
+    </div>`;
+  }
 
-document.getElementById('d').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Nuevo']})}${content('desktop')}</div>`;
+  window.guardarLead = function() {
+    if (!formState.nombre.trim()) { showToast('El nombre es obligatorio', 'error'); return; }
+    const fields = {
+      nombre: formState.nombre.trim(),
+      empresa: formState.empresa.trim(),
+      email: formState.email.trim(),
+      telefono: formState.telefono.trim(),
+      ciudad: formState.ciudad,
+      origen: formState.origen,
+      intereses: formState.intereses,
+      estado: formState.estado,
+      asesor: currentUser
+    };
+    const lead = crm.addLead(fields);
+    if (!lead) { showToast('Error al guardar. Intenta de nuevo.', 'error'); return; }
+    if (formState.comentarios.trim()) { crm.addComentario(lead.id, formState.comentarios.trim(), 'LLAMADA'); }
+    crm.recalculateMetricas();
+    showToast('Lead creado exitosamente', 'success');
+    setTimeout(() => { window.location.href = '03-leads-kanban.html'; }, 1200);
+  }
+
+  renderAll();
+};
 </script>
 </body>
 </html>

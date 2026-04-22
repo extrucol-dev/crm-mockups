@@ -58,96 +58,113 @@
 </div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isCompact = bp === 'mobile' || bp === 'tablet';
-  const isMobile = bp === 'mobile';
+window.onCRMDataLoaded = function(crm) {
+  const metricas = crm.getMetricas();
+  const allLeads = crm.data.leads;
+  const allOpp = crm.data.oportunidades;
+  const allUsuarios = crm.data.usuarios.ejecutivos;
 
-  const statCards = `
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--accent">${Icons.currency}</div>
-      <div class="stat-card__label">Pipeline total</div>
-      <div class="stat-card__value stat-card__value--accent">$ 4.820 M</div>
-      <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+12%</span> vs mes anterior</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--success">${Icons.trophy}</div>
-      <div class="stat-card__label">Ventas del mes</div>
-      <div class="stat-card__value stat-card__value--success">$ 1.240 M</div>
-      <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+8%</span> 8 oportunidades</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon">${Icons.chartPie}</div>
-      <div class="stat-card__label">Tasa conversión</div>
-      <div class="stat-card__value">32%</div>
-      <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--down">-2%</span> Leads → Ganadas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--green">${Icons.users}</div>
-      <div class="stat-card__label">Clientes nuevos</div>
-      <div class="stat-card__value stat-card__value--green">5</div>
-      <div class="stat-card__subtext">Este mes · monto ≥ $50M</div>
-    </div>
-  `;
+  function content(bp) {
+    const isCompact = bp === 'mobile' || bp === 'tablet';
+    const isMobile = bp === 'mobile';
 
-  const meses = ['Oct','Nov','Dic','Ene','Feb','Mar','Abr'];
-  const valores = [65,72,58,85,70,92,78];
-  const chartHTML = valores.map((v, i) => `
-    <div class="chart-bar-group">
-      <div class="chart-bar-wrap">
-        <div class="chart-bar" style="height: ${v}%"></div>
-        <div class="chart-bar chart-bar--light" style="height: ${v * 0.7}%"></div>
+    const totalPipeline = allOpp.filter(o => !['Cerrada Ganada', 'Cerrada Perdida'].includes(o.estado)).reduce((s, o) => s + (o.valor || 0), 0);
+    const ventasCerradas = allOpp.filter(o => o.estado === 'Cerrada Ganada').reduce((s, o) => s + (o.valor || 0), 0);
+    const nuevasEmpresas = allOpp.filter(o => o.estado === 'Cerrada Ganada').length;
+    const tasa = allLeads.length > 0 ? ((nuevasEmpresas / allLeads.length) * 100).toFixed(0) : 0;
+
+    const statCards = `
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--accent">${Icons.currency}</div>
+        <div class="stat-card__label">Pipeline total</div>
+        <div class="stat-card__value stat-card__value--accent">${crm.formatCurrency(totalPipeline).replace('COP', '').trim()}</div>
+        <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+12%</span> vs mes anterior</div>
       </div>
-      <span class="chart-bar-label">${meses[i]}</span>
-    </div>
-  `).join('');
-
-  const stages = [
-    { label: 'Leads generados', count: 240, pct: 100 },
-    { label: 'Contactados', count: 168, pct: 70 },
-    { label: 'Interesados', count: 108, pct: 45 },
-    { label: 'Calificados', count: 76, pct: 32 },
-    { label: 'En propuesta', count: 52, pct: 22 },
-    { label: 'Ganadas', count: 32, pct: 13 },
-  ];
-  const funnelHTML = stages.map(s => `
-    <div class="funnel-stage">
-      <div style="min-width: 140px; font-size: 12.5px; color: var(--text-secondary); font-weight: 600;">${s.label}</div>
-      <div class="funnel-bar-container">
-        <div class="funnel-bar" style="width: ${s.pct}%;">${s.count}</div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--success">${Icons.trophy}</div>
+        <div class="stat-card__label">Ventas del mes</div>
+        <div class="stat-card__value stat-card__value--success">${crm.formatCurrency(ventasCerradas).replace('COP', '').trim()}</div>
+        <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+8%</span> ${nuevasEmpresas} oportunidades</div>
       </div>
-      <div style="min-width: 50px; text-align: right; font-size: 12px; color: var(--text-muted); font-weight: 600;">${s.pct}%</div>
-    </div>
-  `).join('');
-
-  const ranking = [
-    { pos: 1, name: 'María García', ventas: '$ 420 M', opp: 9, avatar: 'MG', color: 3, trend: 'up', pct: 15 },
-    { pos: 2, name: 'Juan Pérez', ventas: '$ 385 M', opp: 12, avatar: 'JP', color: 1, trend: 'up', pct: 12 },
-    { pos: 3, name: 'Ana Martínez', ventas: '$ 260 M', opp: 11, avatar: 'AM', color: 4, trend: 'down', pct: 5 },
-    { pos: 4, name: 'Laura Jiménez', ventas: '$ 215 M', opp: 8, avatar: 'LJ', color: 2, trend: 'up', pct: 8 },
-    { pos: 5, name: 'Carlos Rodríguez', ventas: '$ 180 M', opp: 6, avatar: 'CR', color: 5, trend: 'down', pct: 11 },
-  ];
-
-  const rankingHTML = ranking.map(r => `
-    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);">
-      <div style="width: 28px; text-align: center; font-weight: 800; font-size: 14px; color: ${r.pos <= 3 ? 'var(--accent)' : 'var(--text-muted)'};">
-        ${r.pos === 1 ? '🥇' : r.pos === 2 ? '🥈' : r.pos === 3 ? '🥉' : r.pos}
+      <div class="stat-card">
+        <div class="stat-card__icon">${Icons.chartPie}</div>
+        <div class="stat-card__label">Tasa conversión</div>
+        <div class="stat-card__value">${tasa}%</div>
+        <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--down">-2%</span> Leads → Ganadas</div>
       </div>
-      <div class="avatar avatar--sm avatar--color-${r.color}">${r.avatar}</div>
-      <div style="flex: 1;">
-        <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${r.name}</div>
-        <div style="font-size: 11.5px; color: var(--text-muted);">${r.opp} oportunidades</div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--green">${Icons.users}</div>
+        <div class="stat-card__label">Clientes nuevos</div>
+        <div class="stat-card__value stat-card__value--green">${metricas?.leads_por_estado.find(s => s.estado === 'Nuevo')?.count || 0}</div>
+        <div class="stat-card__subtext">Este mes · monto ≥ $50M</div>
       </div>
-      <div style="text-align: right;">
-        <div style="font-weight: 700; font-size: 13.5px; color: var(--accent);">${r.ventas}</div>
-        <div style="font-size: 11px; color: var(--${r.trend === 'up' ? 'success' : 'error'});">
-          ${r.trend === 'up' ? '▲' : '▼'} ${r.trend === 'up' ? '+' : '-'}${r.pct}%
+    `;
+
+    const meses = ['Oct','Nov','Dic','Ene','Feb','Mar','Abr'];
+    const valores = [65,72,58,85,70,92,78];
+    const chartHTML = valores.map((v, i) => `
+      <div class="chart-bar-group">
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height: ${v}%"></div>
+          <div class="chart-bar chart-bar--light" style="height: ${v * 0.7}%"></div>
+        </div>
+        <span class="chart-bar-label">${meses[i]}</span>
+      </div>
+    `).join('');
+
+    const funnelData = [
+      { label: 'Leads generados', count: allLeads.length, pct: 100 },
+      { label: 'Contactados', count: allLeads.filter(l => ['Contactado','Interesado','Enviado a distribuidor'].includes(l.estado)).length, pct: 0 },
+      { label: 'Interesados', count: allLeads.filter(l => l.estado === 'Interesado').length, pct: 0 },
+      { label: 'Calificados', count: allOpp.filter(o => !['Cerrada Ganada','Cerrada Perdida'].includes(o.estado)).length, pct: 0 },
+      { label: 'En propuesta', count: allOpp.filter(o => o.estado === 'Propuesta').length, pct: 0 },
+      { label: 'Ganadas', count: allOpp.filter(o => o.estado === 'Cerrada Ganada').length, pct: 0 },
+    ];
+    funnelData.forEach((f, i) => { f.pct = i === 0 ? 100 : Math.round((f.count / funnelData[0].count) * 100); });
+
+    const funnelHTML = funnelData.map(s => `
+      <div class="funnel-stage">
+        <div style="min-width: 140px; font-size: 12.5px; color: var(--text-secondary); font-weight: 600;">${s.label}</div>
+        <div class="funnel-bar-container">
+          <div class="funnel-bar" style="width: ${s.pct}%;">${s.count}</div>
+        </div>
+        <div style="min-width: 50px; text-align: right; font-size: 12px; color: var(--text-muted); font-weight: 600;">${s.pct}%</div>
+      </div>
+    `).join('');
+
+    const ranking = metricas?.ventas_por_asesor.map((v, i) => ({
+      pos: i + 1,
+      name: v.asesor,
+      ventas: crm.formatCurrency(v.ventas).replace('COP', '').trim(),
+      opp: v.opps,
+      avatar: v.asesor.substring(0, 2).toUpperCase(),
+      color: (i % 6) + 1,
+      trend: 'up',
+      pct: Math.floor(Math.random() * 20) + 5
+    })) || [];
+
+    const rankingHTML = ranking.map(r => `
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <div style="width: 28px; text-align: center; font-weight: 800; font-size: 14px; color: ${r.pos <= 3 ? 'var(--accent)' : 'var(--text-muted)'};">
+          ${r.pos === 1 ? '🥇' : r.pos === 2 ? '🥈' : r.pos === 3 ? '🥉' : r.pos}
+        </div>
+        <div class="avatar avatar--sm avatar--color-${r.color}">${r.avatar}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${r.name}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">${r.opp} oportunidades</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 700; font-size: 13.5px; color: var(--accent);">${r.ventas}</div>
+          <div style="font-size: 11px; color: var(--success);">
+            ▲ +${r.pct}%
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
 
-  const sectoresHTML = `
+    const sectoresHTML = `
     <div style="display: flex; align-items: center; gap: 20px; ${isMobile ? 'flex-direction: column;' : ''}">
       <div class="donut">
         <div class="donut__center">
@@ -254,7 +271,7 @@ function content(bp) {
         <div class="card">
           <div class="card__header">
             <div><div class="card__title">Ranking ejecutivos</div><div class="card__subtitle">Top 5 ventas del mes</div></div>
-            <button class="btn btn--ghost btn--sm">Ver todos</button>
+            <a href="05-equipo-comercial.html" style="text-decoration: none; color: inherit;"><button class="btn btn--ghost btn--sm">Ver todos</button></a>
           </div>
           <div class="card__body" style="padding-top: 0; padding-bottom: 0;">${rankingHTML}</div>
         </div>
@@ -286,7 +303,7 @@ function content(bp) {
                 <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Q2</div>
                 <div style="font-size: 22px; font-weight: 800; color: var(--accent);">$ 3.390 M</div>
               </div>
-              <button class="btn btn--ghost btn--sm">${Icons.chartBar} Detalle</button>
+              <a href="04-forecasting.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">${Icons.chartBar} Detalle</button></a>
             </div>
           </div>
         </div>
@@ -303,6 +320,7 @@ function content(bp) {
 document.getElementById('d').innerHTML = `${renderSidebar('dashboard','director')}<div class="main-area">${renderTopbar({title:'Dashboard Ejecutivo'})}${content('desktop')}</div>`;
 document.getElementById('t').innerHTML = `${renderSidebar('dashboard','director')}<div class="main-area">${renderTopbar({title:'Dashboard'})}${content('tablet')}</div>`;
 document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Dashboard', actions:`<button class="topbar__icon-btn">${Icons.download}</button>`})}${content('mobile')}</div>`;
+};
 </script>
 </body>
 </html>

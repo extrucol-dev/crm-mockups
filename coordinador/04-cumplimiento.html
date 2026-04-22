@@ -210,8 +210,6 @@ function content(bp) {
 }
 
 document.getElementById('d').innerHTML = `${renderSidebar('cumplimiento','coordinador')}<div class="main-area">${renderTopbar({title:'Reporte de cumplimiento'})}${content('desktop')}</div>`;
-document.getElementById('t').innerHTML = `${renderSidebar('cumplimiento','coordinador')}<div class="main-area">${renderTopbar({title:'Cumplimiento'})}${content('tablet')}</div>`;
-document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Cumplimiento', actions:`<button class="topbar__icon-btn">${Icons.calendar}</button>`})}${content('mobile')}</div>`;
 </script>
 </body>
 </html>

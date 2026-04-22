@@ -8,41 +8,6 @@
 <style>
   .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
   .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
-  .bp-col { display: flex; flex-direction: column; }
-
-  /* Ajustes específicos de esta pantalla */
-  .kanban-mobile-tabs {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 8px 0;
-    margin: 0 -16px;
-    padding-left: 16px;
-    padding-right: 16px;
-    scrollbar-width: none;
-  }
-  .kanban-mobile-tabs::-webkit-scrollbar { display: none; }
-  .kanban-mobile-tab {
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .kanban-mobile-tab.is-active {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
-  }
-  .kanban-mobile-tab .dot { width: 6px; height: 6px; border-radius: 999px; }
-
   .closed-toggle {
     margin-top: 20px;
     padding: 12px 16px;
@@ -57,164 +22,103 @@
 </style>
 </head>
 <body>
-<div >
-  <div>
-
-
-    <div >
-      <!-- DESKTOP -->
-      <div>
-        <div >
-          <div class="app-shell" id="desktop-shell"></div>
-        </div>
-      </div>
-      
-    </div>
-
-  </div>
-</div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-// ============================================================
-// DATA: Oportunidades mock
-// ============================================================
+const currentUser = 'PAOLA';
 
-const oportunidades = {
-  PROSPECTO: {
-    color: '#3B82F6',
-    items: [
-      { titulo: 'Licitación acueducto Bucaramanga', empresa: 'EMPAS S.A.', valor: '$ 120 M', fecha: '15 Mar', avatar: 'ES', color: 2 },
-      { titulo: 'Cotización tubería PE100', empresa: 'Distriaguas SAS', valor: '$ 45 M', fecha: '12 Mar', avatar: 'DS', color: 3 },
-      { titulo: 'Sistema riego cultivo', empresa: 'Agrícola El Prado', valor: '$ 78 M', fecha: '10 Mar', avatar: 'AP', color: 4 },
-      { titulo: 'Ampliación red gas', empresa: 'Hidrogas SA', valor: '$ 95 M', fecha: '08 Mar', avatar: 'HS', color: 1 },
-    ]
-  },
-  CALIFICACION: {
-    color: '#F97316',
-    items: [
-      { titulo: 'Proyecto alcantarillado', empresa: 'EAAB', valor: '$ 340 M', fecha: '18 Mar', avatar: 'EA', color: 5 },
-      { titulo: 'Sistema presurizado', empresa: 'Ingenio del Cauca', valor: '$ 180 M', fecha: '16 Mar', avatar: 'IC', color: 6 },
-      { titulo: 'Accesorios PE industrial', empresa: 'Tecnoagua SAS', valor: '$ 52 M', fecha: '14 Mar', avatar: 'TS', color: 2 },
-    ]
-  },
-  PROPUESTA: {
-    color: '#A855F7',
-    items: [
-      { titulo: 'Ampliación planta trat.', empresa: 'Aguas del Valle', valor: '$ 215 M', fecha: '20 Mar', avatar: 'AV', color: 3 },
-      { titulo: 'Reposición red matriz', empresa: 'Acueducto Metrop.', valor: '$ 420 M', fecha: '19 Mar', avatar: 'AM', color: 1 },
-      { titulo: 'Riego por goteo 30 Ha', empresa: 'Palmares del Sur', valor: '$ 88 M', fecha: '17 Mar', avatar: 'PS', color: 4 },
-    ]
-  },
-  NEGOCIACION: {
-    color: '#EAB308',
-    items: [
-      { titulo: 'Suministro anual tubería', empresa: 'Constructora Andina', valor: '$ 560 M', fecha: '22 Mar', avatar: 'CA', color: 6 },
-      { titulo: 'Línea conducción 8km', empresa: 'Distriaguas Caribe', valor: '$ 380 M', fecha: '21 Mar', avatar: 'DC', color: 5 },
-    ]
-  },
-  GANADA: { color: '#22C55E', items: [
-    { titulo: 'Proyecto Acueducto Norte', empresa: 'Tecnoagua SAS', valor: '$ 410 M', fecha: '05 Mar', avatar: 'TS', color: 2 },
-    { titulo: 'Riego Palmales Fase 2', empresa: 'Palmares Sur', valor: '$ 125 M', fecha: '28 Feb', avatar: 'PS', color: 3 },
-  ]},
-  PERDIDA: { color: '#EF4444', items: [
-    { titulo: 'Licitación menor', empresa: 'Municipio de X', valor: '$ 65 M', fecha: '01 Mar', avatar: 'MX', color: 5 },
-  ]}
-};
-
-const estadoLabels = {
-  PROSPECTO: { label: 'Prospección', badgeClass: 'prospecto' },
-  CALIFICACION: { label: 'Calificación', badgeClass: 'calificacion' },
-  PROPUESTA: { label: 'Propuesta', badgeClass: 'propuesta' },
-  NEGOCIACION: { label: 'Negociación', badgeClass: 'negociacion' },
-  GANADA: { label: 'Ganada', badgeClass: 'ganada' },
-  PERDIDA: { label: 'Perdida', badgeClass: 'perdida' },
-};
-
-function renderKanbanCard(op, estadoKey) {
-  const s = estadoLabels[estadoKey];
-  return `
-    <a href="04-oportunidad-detalle.html" style="text-decoration: none; color: inherit;">
-      <div class="kanban-card">
-        <span class="badge badge--${s.badgeClass}"><span class="dot"></span> ${s.label}</span>
-        <div class="kanban-card__title">${op.titulo}</div>
-        <div class="kanban-card__company">${op.empresa}</div>
-        <div class="kanban-card__value">${op.valor}</div>
-        <div class="kanban-card__footer">
-          <span class="kanban-card__date">${Icons.calendar} ${op.fecha}</span>
-          <div class="avatar avatar--xs avatar--color-${op.color}">${op.avatar}</div>
-        </div>
-      </div>
-    </a>
-  `;
+let closedExpanded = false;
+function toggleClosed() {
+  closedExpanded = !closedExpanded;
+  const section = document.getElementById('closed-kanban');
+  const icon = document.getElementById('closed-toggle-icon');
+  if (closedExpanded) {
+    section.style.display = 'block';
+    icon.innerHTML = Icons.chevronDown;
+  } else {
+    section.style.display = 'none';
+    icon.innerHTML = Icons.chevronRight;
+  }
 }
 
-function renderKanbanColumn(estadoKey) {
-  const col = oportunidades[estadoKey];
-  const s = estadoLabels[estadoKey];
-  const cards = col.items.map(op => renderKanbanCard(op, estadoKey)).join('');
-  return `
-    <div class="kanban-col">
-      <div class="kanban-col__header">
-        <span class="kanban-col__dot" style="background:${col.color}"></span>
-        <span class="kanban-col__label">${s.label}</span>
-        <span class="kanban-col__count">${col.items.length}</span>
-      </div>
-      <div class="kanban-col__line" style="background:${col.color}"></div>
-      <div class="kanban-col__list">
-        ${cards || `<div class="kanban-col__empty">Sin oportunidades</div>`}
-      </div>
-    </div>
-  `;
-}
+window.onCRMDataLoaded = function(crm) {
+  const misOpp = crm.getOportunidades({ asesor: currentUser });
 
-// ============================================================
-// CONTENT
-// ============================================================
+  const estadoLabels = {
+    PROSPECTO:   { label: 'Prospección',  badgeClass: 'prospecto',  color: '#3B82F6' },
+    CALIFICACION:{ label: 'Calificación', badgeClass: 'calificacion', color: '#F97316' },
+    PROPUESTA:   { label: 'Propuesta',    badgeClass: 'propuesta',  color: '#A855F7' },
+    NEGOCIACION: { label: 'Negociación',  badgeClass: 'negociacion', color: '#EAB308' },
+    GANADA:      { label: 'Ganada',       badgeClass: 'ganada',     color: '#22C55E' },
+    PERDIDA:     { label: 'Perdida',       badgeClass: 'perdida',    color: '#EF4444' },
+  };
 
-function kanbanContent(bp = 'desktop') {
-  if (bp === 'mobile') {
-    // Mobile: tabs horizontales + una columna a la vez
-    const activeTab = 'PROSPECTO';
+  const oppPorEstado = {
+    PROSPECTO:    misOpp.filter(o => o.estado === 'Prospeccion'),
+    CALIFICACION: misOpp.filter(o => o.estado === 'Calificacion'),
+    PROPUESTA:    misOpp.filter(o => o.estado === 'Propuesta'),
+    NEGOCIACION:  misOpp.filter(o => o.estado === 'Negociacion'),
+    GANADA:       misOpp.filter(o => o.estado === 'Cerrada Ganada'),
+    PERDIDA:      misOpp.filter(o => o.estado === 'Cerrada Perdida'),
+  };
+
+  function renderKanbanCard(op) {
+    const estadoKey = Object.keys(estadoLabels).find(k => estadoLabels[k].label === op.estado) || 'PROSPECTO';
+    const s = estadoLabels[estadoKey];
     return `
-      <div class="content" style="padding-top: 0;">
-        <div class="kanban-mobile-tabs">
-          ${Object.keys(oportunidades).filter(k => !['GANADA','PERDIDA'].includes(k)).map(k => `
-            <div class="kanban-mobile-tab ${k === activeTab ? 'is-active' : ''}">
-              <span class="dot" style="background:${oportunidades[k].color}"></span>
-              ${estadoLabels[k].label}
-              <span style="opacity:.75;">${oportunidades[k].items.length}</span>
-            </div>
-          `).join('')}
-          <div class="kanban-mobile-tab">
-            <span class="dot" style="background:#22C55E"></span>
-            Cerradas
-            <span style="opacity:.75;">${oportunidades.GANADA.items.length + oportunidades.PERDIDA.items.length}</span>
+      <a href="04-oportunidad-detalle.html?id=${op.id}" style="text-decoration: none; color: inherit;">
+        <div class="kanban-card">
+          <span class="badge badge--${s.badgeClass}"><span class="dot"></span> ${op.estado}</span>
+          <div class="kanban-card__title">${op.nombre}</div>
+          <div class="kanban-card__company">${op.empresa}</div>
+          <div class="kanban-card__value">${crm.formatCurrency(op.valor).replace('COP', '').trim()}</div>
+          <div class="kanban-card__footer">
+            <span class="kanban-card__date">${Icons.calendar} ${crm.formatDate(op.fecha_cierre)}</span>
+            <div class="avatar avatar--xs">${op.asesor.substring(0,2)}</div>
           </div>
         </div>
-        <div style="padding: 16px 0;">
-          <div class="kanban-col__list" style="gap: 10px;">
-            ${oportunidades[activeTab].items.map(op => renderKanbanCard(op, activeTab)).join('')}
-          </div>
+      </a>
+    `;
+  }
+
+  function renderKanbanColumn(estadoKey) {
+    const col = oppPorEstado[estadoKey];
+    const s = estadoLabels[estadoKey];
+    const cards = col.map(op => renderKanbanCard(op)).join('');
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col__header">
+          <span class="kanban-col__dot" style="background:${s.color}"></span>
+          <span class="kanban-col__label">${s.label}</span>
+          <span class="kanban-col__count">${col.length}</span>
+        </div>
+        <div class="kanban-col__line" style="background:${s.color}"></div>
+        <div class="kanban-col__list">
+          ${cards || `<div class="kanban-col__empty">Sin oportunidades</div>`}
         </div>
       </div>
     `;
   }
 
-  // Desktop + Tablet
-  return `
+  const total = misOpp.length;
+  const totalPipeline = misOpp.filter(o => !['Cerrada Ganada', 'Cerrada Perdida'].includes(o.estado)).reduce((s, o) => s + (o.valor || 0), 0);
+  const ganadas = oppPorEstado.GANADA.length;
+  const perdidas = oppPorEstado.PERDIDA.length;
+
+  const html = `
     <div class="content">
       <div class="page-head">
         <div class="page-head__title-group">
           <div class="page-head__title">Mis Oportunidades</div>
           <div class="page-head__subtitle">
-            ${Object.values(oportunidades).reduce((a,b)=>a+b.items.length,0)} oportunidades
-            · $ 2.920 M en pipeline
+            ${total} oportunidades · ${crm.formatCurrency(totalPipeline).replace('COP', '').trim()} en pipeline
           </div>
         </div>
         <div class="page-head__actions">
           <button class="btn btn--secondary btn--sm">${Icons.filter} Filtros</button>
-          <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+          <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit;">
             <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button>
           </a>
         </div>
@@ -222,14 +126,14 @@ function kanbanContent(bp = 'desktop') {
 
       <div class="filter-bar">
         <div class="input-wrapper" style="flex:1; max-width: 320px;">
-          ${Icons.search.replace('class="icon"', 'class="icon"')}
+          ${Icons.search}
           <input class="input input--with-icon" placeholder="Buscar por título, empresa...">
         </div>
         <select class="select" style="max-width: 180px;">
           <option>Todos los sectores</option>
-          <option>Agua potable</option>
-          <option>Gas</option>
-          <option>Agro/Riego</option>
+          <option>Agua</option>
+          <option>Industria</option>
+          <option>Construccion</option>
         </select>
         <select class="select" style="max-width: 180px;">
           <option>Todos los tipos</option>
@@ -248,58 +152,41 @@ function kanbanContent(bp = 'desktop') {
         </div>
       </div>
 
-      <!-- Kanban activo -->
-      <div class="kanban ${bp === 'tablet' ? 'kanban--2' : 'kanban--4'}" style="${bp === 'tablet' ? 'grid-template-columns: repeat(2, 1fr);' : ''}">
+      <div class="kanban kanban--4">
         ${renderKanbanColumn('PROSPECTO')}
         ${renderKanbanColumn('CALIFICACION')}
         ${renderKanbanColumn('PROPUESTA')}
         ${renderKanbanColumn('NEGOCIACION')}
       </div>
 
-      <!-- Toggle oportunidades cerradas -->
-      <div class="closed-toggle">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          ${Icons.chevronRight}
-          <span style="font-weight: 600; color: var(--text-primary);">Oportunidades cerradas</span>
-          <span class="badge badge--ganada"><span class="dot"></span> ${oportunidades.GANADA.items.length} ganadas</span>
-          <span class="badge badge--perdida"><span class="dot"></span> ${oportunidades.PERDIDA.items.length} perdida</span>
+      <div id="closed-section">
+        <div class="closed-toggle" onclick="toggleClosed()" style="cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="closed-toggle-icon">${Icons.chevronRight}</span>
+            <span style="font-weight: 600; color: var(--text-primary);">Oportunidades cerradas</span>
+            <span class="badge badge--ganada"><span class="dot"></span> ${ganadas} ganadas</span>
+            <span class="badge badge--perdida"><span class="dot"></span> ${perdidas} perdida</span>
+          </div>
+          <span style="font-size: 12px; color: var(--text-muted);">Este trimestre</span>
         </div>
-        <span style="font-size: 12px; color: var(--text-muted);">Este trimestre</span>
+        <div id="closed-kanban" style="display: none; margin-top: 12px;">
+          <div class="kanban kanban--2">
+            ${renderKanbanColumn('GANADA')}
+            ${renderKanbanColumn('PERDIDA')}
+          </div>
+        </div>
       </div>
     </div>
   `;
-}
 
-// ============================================================
-// RENDER
-// ============================================================
-
-document.getElementById('desktop-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ title: 'Mis Oportunidades' })}
-    ${kanbanContent('desktop')}
-  </div>
-`;
-
-document.getElementById('tablet-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ title: 'Oportunidades' })}
-    ${kanbanContent('tablet')}
-  </div>
-`;
-
-document.getElementById('mobile-shell').innerHTML = `
-  <div class="main-area">
-    ${renderTopbar({ title: 'Oportunidades', actions: `
-      <button class="topbar__icon-btn">${Icons.filter}</button>
-      <button class="topbar__icon-btn">${Icons.plus}</button>
-    `})}
-    ${kanbanContent('mobile')}
-    ${renderMobileBottomNav('oportunidades')}
-  </div>
-`;
+  document.getElementById('desktop-shell').innerHTML = `
+    ${renderSidebar('oportunidades', 'ejecutivo')}
+    <div class="main-area">
+      ${renderTopbar({ title: 'Mis Oportunidades' })}
+      ${html}
+    </div>
+  `;
+};
 </script>
 </body>
 </html>

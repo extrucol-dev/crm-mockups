@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRM Extrucol · Ejecutivo · Agregar Producto</title>
+<link rel="stylesheet" href="../shared/tokens.css">
+<link rel="stylesheet" href="../shared/components.css">
+<style>
+  .modal-overlay {
+    position: absolute; inset: 0;
+    background: rgba(26,26,26,0.5);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 60px 24px;
+    z-index: 100;
+  }
+  .modal-content {
+    background: var(--surface);
+    border-radius: 12px;
+    max-width: 640px; width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    overflow: hidden;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; gap: 10px;
+    background: var(--page-bg);
+    flex-shrink: 0;
+  }
+
+  .search-result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 120ms;
+  }
+  .search-result-item:hover { background: var(--page-bg); }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item__icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--primary-bg); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .product-selected-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .product-selected-row:last-child { border-bottom: none; }
+  .product-selected-row__icon {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: var(--primary-bg); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .product-table th {
+    text-align: left;
+    font-size: var(--fs-xxs);
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--page-bg);
+  }
+  .product-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--fs-body);
+    vertical-align: middle;
+  }
+  .product-table tr:last-child td { border-bottom: none; }
+  .product-table__input {
+    width: 70px;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: var(--fs-body);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-sm);
+  }
+  .product-table__input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(36,56,140,0.15);
+  }
+  .product-table__input--discount { width: 60px; }
+  .product-table__subtotal {
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: right;
+  }
+  .remove-btn {
+    width: 28px; height: 28px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    transition: all var(--transition-fast);
+  }
+  .remove-btn:hover { background: var(--error-bg); color: var(--error); }
+</style>
+</head>
+<body>
+<div style="height: 900px; position: relative;" id="app"></div>
+
+<script src="../shared/components.js"></script>
+<script>
+const catalogoProductos = [
+  { id: 1, nombre: 'Tubería PE100 SDR 11 - 4"', tipo: 'Conducción agua potable', presion: '16 bar', precio: 285000 },
+  { id: 2, nombre: 'Tubería PE100 SDR 17 - 6"', tipo: 'Conducción gas', presion: '10 bar', precio: 420000 },
+  { id: 3, nombre: 'Accesorios electrofusión 4"', tipo: 'Codos 90°, tees, reducciones', presion: 'EF', precio: 85000 },
+  { id: 4, nombre: 'Válvulas de compuerta 4"', tipo: 'AWWA C509', presion: 'Vástago no ascendente', precio: 560000 },
+  { id: 5, nombre: 'Tubería PE100 SDR 11 - 2"', tipo: 'Conducción agua potable', presion: '16 bar', precio: 145000 },
+  { id: 6, nombre: 'Codo 90° PE100 4" EF', tipo: 'Accesorio fundición', presion: 'PN16', precio: 42000 },
+  { id: 7, nombre: 'Tee reducción 6"x4" PE100', tipo: 'Accesorio electrofusión', presion: 'PN16', precio: 95000 },
+  { id: 8, nombre: 'Bridas de transición 4"', tipo: 'Conexión PVC-PE', presion: 'PN16', precio: 68000 },
+  { id: 9, nombre: 'Sistema de riego por goteo', tipo: 'Agricultura', presion: '1-3 bar', precio: 1200000 },
+  { id: 10, nombre: 'Filtro de arena 30" ', tipo: 'Tratamiento agua', presion: 'Hasta 6 bar', precio: 890000 },
+];
+
+function formatCurrency(num) {
+  return '$ ' + num.toLocaleString('es-CO');
+}
+
+function calcularSubtotal(cantidad, precio, descuento) {
+  return cantidad * precio * (1 - descuento / 100);
+}
+
+const estadoInicial = {
+  busqueda: '',
+  selectedProduct: null,
+  productosAgregados: [],
+  cantidad: 1,
+  descuento: 0,
+};
+
+let state = { ...estadoInicial };
+
+function renderSearchResults() {
+  if (!state.busqueda || state.busqueda.length < 2) {
+    return `<div style="padding: 20px; text-align: center; color: var(--text-disabled); font-size: var(--fs-small);">
+      Escribe al menos 2 caracteres para buscar
+    </div>`;
+  }
+
+  const query = state.busqueda.toLowerCase();
+  const resultados = catalogoProductos.filter(p =>
+    p.nombre.toLowerCase().includes(query) ||
+    p.tipo.toLowerCase().includes(query)
+  );
+
+  if (resultados.length === 0) {
+    return `<div style="padding: 20px; text-align: center; color: var(--text-disabled); font-size: var(--fs-small);">
+      No se encontraron productos
+    </div>`;
+  }
+
+  return resultados.map(p => `
+    <div class="search-result-item" onclick="selectProduct(${p.id})">
+      <div class="search-result-item__icon">${Icons.archive}</div>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; color: var(--text-primary); font-size: var(--fs-label);">${p.nombre}</div>
+        <div style="font-size: var(--fs-small); color: var(--text-muted);">${p.tipo} · ${p.presion}</div>
+      </div>
+      <div style="font-weight: 700; color: var(--primary); font-size: var(--fs-label);">${formatCurrency(p.precio)}</div>
+    </div>
+  `).join('');
+}
+
+function renderSelectedProduct() {
+  if (!state.selectedProduct) return '';
+
+  const p = state.selectedProduct;
+  return `
+    <div class="product-selected-row">
+      <div class="product-selected-row__icon">${Icons.archive}</div>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; color: var(--text-primary); font-size: var(--fs-label);">${p.nombre}</div>
+        <div style="font-size: var(--fs-small); color: var(--text-muted);">Precio unitario: ${formatCurrency(p.precio)}</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="form-field" style="margin: 0;">
+          <label class="form-field__label" style="font-size: 11px; margin-bottom: 2px;">Cant.</label>
+          <input type="number" class="product-table__input" value="${state.cantidad}" min="1" id="cantidad-input" onchange="updateCantidad(this.value)">
+        </div>
+        <div class="form-field" style="margin: 0;">
+          <label class="form-field__label" style="font-size: 11px; margin-bottom: 2px;">Dto.%</label>
+          <input type="number" class="product-table__input product-table__input--discount" value="${state.descuento}" min="0" max="100" id="descuento-input" onchange="updateDescuento(this.value)">
+        </div>
+        <div style="text-align: right; min-width: 100px;">
+          <div style="font-size: var(--fs-xxs); color: var(--text-muted);">Subtotal</div>
+          <div style="font-weight: 700; color: var(--text-primary);">${formatCurrency(calcularSubtotal(state.cantidad, p.precio, state.descuento))}</div>
+        </div>
+        <button class="remove-btn" onclick="clearSelection()">${Icons.close}</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderProductosAgregados() {
+  if (state.productosAgregados.length === 0) {
+    return '';
+  }
+
+  const filas = state.productosAgregados.map((item, index) => {
+    const subtotal = calcularSubtotal(item.cantidad, item.precio, item.descuento);
+    return `
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 28px; height: 28px; border-radius: 4px; background: var(--primary-bg); color: var(--primary); display: flex; align-items: center; justify-content: center;">${Icons.archive.replace('class="icon"', 'class="icon icon--xs"')}</div>
+            <span style="font-weight: 600; color: var(--text-primary);">${item.nombre}</span>
+          </div>
+        </td>
+        <td style="text-align: center;">${item.cantidad}</td>
+        <td style="text-align: right;">${formatCurrency(item.precio)}</td>
+        <td style="text-align: center;">${item.descuento}%</td>
+        <td class="product-table__subtotal">${formatCurrency(subtotal)}</td>
+        <td style="text-align: center;">
+          <button class="remove-btn" onclick="removeProduct(${index})">${Icons.trash}</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const total = state.productosAgregados.reduce((acc, item) => {
+    return acc + calcularSubtotal(item.cantidad, item.precio, item.descuento);
+  }, 0);
+
+  return `
+    <div style="margin-top: 16px;">
+      <div style="font-size: var(--fs-label); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Productos agregados</div>
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th style="text-align: center;">Cant.</th>
+            <th style="text-align: right;">Precio</th>
+            <th style="text-align: center;">Dto.%</th>
+            <th style="text-align: right;">Subtotal</th>
+            <th style="width: 40px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filas}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" style="text-align: right; font-weight: 700; color: var(--text-primary); padding: 12px;">Total</td>
+            <td class="product-table__subtotal" style="font-size: var(--fs-heading-xs);">${formatCurrency(total)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+}
+
+function render() {
+  document.getElementById('app').innerHTML = `
+    <div class="app-shell">
+      ${renderSidebar('oportunidades', 'ejecutivo')}
+      <div class="main-area">
+        ${renderTopbar({ breadcrumb: ['Oportunidades', 'Detalle', 'Agregar producto'] })}
+        <div class="content"></div>
+      </div>
+    </div>
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: var(--primary-bg); color: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              ${Icons.archive}
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">Agregar productos</div>
+              <div style="font-size: 12.5px; color: var(--text-muted);">OPP-2025-0042 · Proyecto acueducto rural</div>
+            </div>
+          </div>
+          <button class="topbar__icon-btn" onclick="window.close()">${Icons.close}</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Buscador -->
+          <div class="form-field" style="margin-bottom: 16px;">
+            <label class="form-field__label">Buscar producto <span class="req">*</span></label>
+            <div class="input-wrapper">
+              ${Icons.search}
+              <input class="input input--with-icon" placeholder="Escribe el nombre del producto..." value="${state.busqueda}" oninput="updateBusqueda(this.value)">
+            </div>
+          </div>
+
+          <!-- Resultados de búsqueda -->
+          <div id="search-results" style="border: 1px solid var(--border); border-radius: var(--radius-md); max-height: 220px; overflow-y: auto; margin-bottom: 16px;">
+            ${renderSearchResults()}
+          </div>
+
+          <!-- Producto seleccionado -->
+          ${renderSelectedProduct()}
+
+          <!-- Lista de productos ya agregados -->
+          ${renderProductosAgregados()}
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn--secondary" onclick="window.close()">Cancelar</button>
+          <button class="btn btn--primary" onclick="guardarProductos()" ${state.productosAgregados.length === 0 ? 'disabled' : ''}>
+            ${Icons.check} Agregar ${state.productosAgregados.length > 0 ? `(${state.productosAgregados.length})` : ''}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updateBusqueda(val) {
+  state.busqueda = val;
+  document.getElementById('search-results').innerHTML = renderSearchResults();
+}
+
+function selectProduct(id) {
+  state.selectedProduct = catalogoProductos.find(p => p.id === id);
+  state.busqueda = '';
+  state.cantidad = 1;
+  state.descuento = 0;
+  render();
+}
+
+function clearSelection() {
+  state.selectedProduct = null;
+  render();
+}
+
+function updateCantidad(val) {
+  state.cantidad = parseInt(val) || 1;
+  render();
+}
+
+function updateDescuento(val) {
+  state.descuento = parseFloat(val) || 0;
+  render();
+}
+
+function removeProduct(index) {
+  state.productosAgregados.splice(index, 1);
+  render();
+}
+
+function guardarProductos() {
+  if (state.selectedProduct) {
+    state.productosAgregados.push({
+      ...state.selectedProduct,
+      cantidad: state.cantidad,
+      descuento: state.descuento,
+    });
+    state.selectedProduct = null;
+    state.cantidad = 1;
+    state.descuento = 0;
+  }
+  alert('Productos guardados: ' + JSON.stringify(state.productosAgregados.map(p => ({ nombre: p.nombre, cantidad: p.cantidad })), null, 2));
+}
+
+render();
+</script>
+</body>
+</html>

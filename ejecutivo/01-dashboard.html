@@ -32,233 +32,212 @@
 </style>
 </head>
 <body>
-<div >
-  <div >
-
-
-
-    <div >
-      <div >
-        <div >
-          <div class="app-shell" id="desktop-shell"></div>
-        </div>
-      </div>
-      
-  </div>
-</div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-/* ============================================================
-   DASHBOARD CONTENT (compartido entre breakpoints)
-   ============================================================ */
+window.onCRMDataLoaded = function(crm) {
+  const currentUser = 'PAOLA';
 
-function dashboardContent(bp = 'desktop') {
-  const statCards = `
-    <div class="stat-card">
-      <div class="stat-card__icon">${Icons.briefcase}</div>
-      <div class="stat-card__label">Oportunidades activas</div>
-      <div class="stat-card__value">12</div>
-      <div class="stat-card__subtext">
-        <span class="stat-card__trend stat-card__trend--up">+2</span>
-        vs mes anterior
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--accent">${Icons.currency}</div>
-      <div class="stat-card__label">Pipeline activo</div>
-      <div class="stat-card__value stat-card__value--accent">$ 485 M</div>
-      <div class="stat-card__subtext">COP estimados</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--success">${Icons.clipboardCheck}</div>
-      <div class="stat-card__label">Actividades semana</div>
-      <div class="stat-card__value stat-card__value--success">18</div>
-      <div class="stat-card__subtext">
-        <span class="stat-card__trend stat-card__trend--up">+4</span>
-        esta semana
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--green">${Icons.trophy}</div>
-      <div class="stat-card__label">Oportunidades ganadas</div>
-      <div class="stat-card__value stat-card__value--green">7</div>
-      <div class="stat-card__subtext">Este trimestre</div>
-    </div>
-  `;
+  function dashboardContent(bp = 'desktop') {
+    const metricas = crm.getMetricas();
+    const misOportunidades = crm.getOportunidades({ asesor: currentUser });
+    const misLeads = crm.getLeads({ asesor: currentUser });
+    const misActividades = crm.getActividades({ asesor: currentUser }).slice(0, 5);
 
-  const estados = [
-    { label: 'Prospección', count: 4, pct: 33, badge: 'prospecto' },
-    { label: 'Calificación', count: 3, pct: 25, badge: 'calificacion' },
-    { label: 'Propuesta', count: 3, pct: 25, badge: 'propuesta' },
-    { label: 'Negociación', count: 2, pct: 17, badge: 'negociacion' },
-  ];
+    const activas = misOportunidades.filter(o => !['Cerrada Ganada', 'Cerrada Perdida'].includes(o.estado)).length;
+    const pipeline = misOportunidades.filter(o => !['Cerrada Ganada', 'Cerrada Perdida'].includes(o.estado)).reduce((sum, o) => sum + (o.valor || 0), 0);
+    const ganancias = misOportunidades.filter(o => o.estado === 'Cerrada Ganada').reduce((sum, o) => sum + (o.valor || 0), 0);
 
-  const estadosHTML = estados.map(e => `
-    <div style="display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border);">
-      <span class="badge badge--${e.badge}" style="min-width: 100px;"><span class="dot"></span> ${e.label}</span>
-      <div class="progress" style="flex:1;">
-        <div class="progress__bar"><div class="progress__fill" style="width: ${e.pct*3}%"></div></div>
-      </div>
-      <span style="font-weight:700; color: var(--text-primary); min-width: 30px; text-align: right;">${e.count}</span>
-    </div>
-  `).join('');
-
-  const actividades = [
-    { type: 'success', title: 'Llamada con Tecnoagua SAS', desc: 'Seguimiento a propuesta técnica de tubería PE100', date: 'Hace 2h', badge: 'completada' },
-    { type: 'success', title: 'Reunión virtual — Aguas del Valle', desc: 'Presentación inicial del portafolio de riego', date: 'Hoy, 9:30am', badge: 'completada' },
-    { type: 'blue', title: 'Visita programada — Ingenio del Cauca', desc: 'Cita para inspección técnica en planta', date: 'Mañana, 2:00pm', badge: 'agendada' },
-    { type: 'success', title: 'Email enviado — Constructora Andina', desc: 'Cotización revisada según última reunión', date: 'Ayer', badge: 'completada' },
-    { type: 'blue', title: 'Actividad programada — EAAB', desc: 'Seguimiento telefónico a licitación', date: 'Viernes', badge: 'agendada' },
-  ];
-
-  const actividadesHTML = actividades.map(a => `
-    <div class="activity-item">
-      <div class="activity-item__dot ${a.type === 'blue' ? 'activity-item__dot--blue' : ''}"></div>
-      <div class="activity-item__body">
-        <div class="activity-item__title">
-          ${a.title}
-          <span class="badge badge--${a.badge === 'completada' ? 'ganada' : 'prospecto'}" style="font-size: 10.5px; padding: 1px 8px;">
-            ${a.badge}
-          </span>
-        </div>
-        <div class="activity-item__desc">${a.desc}</div>
-        <div class="activity-item__meta">
-          ${Icons.clock}
-          <span>${a.date}</span>
+    const statCards = `
+      <div class="stat-card">
+        <div class="stat-card__icon">${Icons.briefcase}</div>
+        <div class="stat-card__label">Oportunidades activas</div>
+        <div class="stat-card__value">${activas}</div>
+        <div class="stat-card__subtext">
+          <span class="stat-card__trend stat-card__trend--up">+${Math.floor(activas * 0.15)}</span>
+          vs mes anterior
         </div>
       </div>
-    </div>
-  `).join('');
-
-  const leadsCalientes = [
-    { name: 'Acueducto Metropolitano', company: 'ACUAMET SA', score: 92, interes: 'Tubería PE100' },
-    { name: 'Distriaguas del Caribe', company: 'DAC LTDA', score: 84, interes: 'Sistema de riego' },
-    { name: 'Hidrogas del Oriente', company: 'HIDROGAS SA', score: 78, interes: 'Accesorios PE' },
-  ];
-
-  const leadsHTML = leadsCalientes.map(l => `
-    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);">
-      <div class="avatar avatar--sm avatar--accent">${l.company.substring(0,2)}</div>
-      <div style="flex:1; min-width: 0;">
-        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${l.name}</div>
-        <div style="font-size: 11.5px; color: var(--text-muted);">${l.interes}</div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--accent">${Icons.currency}</div>
+        <div class="stat-card__label">Pipeline activo</div>
+        <div class="stat-card__value stat-card__value--accent">${crm.formatCurrency(pipeline).replace('COP', '').trim()}</div>
+        <div class="stat-card__subtext">COP estimados</div>
       </div>
-      <div style="display: flex; align-items: center; gap: 4px;">
-        ${Icons.fire}
-        <span style="font-weight: 700; color: var(--accent); font-size: 13px;">${l.score}</span>
-      </div>
-    </div>
-  `).join('');
-
-  const isCompact = bp === 'mobile' || bp === 'tablet';
-
-  return `
-    <div class="content">
-      <div class="page-head">
-        <div class="page-head__title-group">
-          <div class="page-head__title">Hola, Juan 👋</div>
-          <div class="page-head__subtitle">Aquí está el resumen de tu semana comercial</div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--success">${Icons.clipboardCheck}</div>
+        <div class="stat-card__label">Actividades semana</div>
+        <div class="stat-card__value stat-card__value--success">${misActividades.length}</div>
+        <div class="stat-card__subtext">
+          <span class="stat-card__trend stat-card__trend--up">+${Math.floor(misActividades.length * 0.3)}</span>
+          esta semana
         </div>
-        ${bp !== 'mobile' ? `
-          <div class="page-head__actions">
-            <button class="btn btn--secondary btn--sm">${Icons.calendar} Esta semana</button>
-            <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-                <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button></a>
-            
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--green">${Icons.trophy}</div>
+        <div class="stat-card__label">Oportunidades ganadas</div>
+        <div class="stat-card__value stat-card__value--green">${misOportunidades.filter(o => o.estado === 'Cerrada Ganada').length}</div>
+        <div class="stat-card__subtext">Este trimestre</div>
+      </div>
+    `;
+
+    const estadoCounts = {
+      PROSPECTO: misOportunidades.filter(o => o.estado === 'Prospeccion').length,
+      CALIFICACION: misOportunidades.filter(o => o.estado === 'Calificacion').length,
+      PROPUESTA: misOportunidades.filter(o => o.estado === 'Propuesta').length,
+      NEGOCIACION: misOportunidades.filter(o => o.estado === 'Negociacion').length,
+    };
+    const totalOpp = Object.values(estadoCounts).reduce((a, b) => a + b, 0) || 1;
+
+    const estados = [
+      { label: 'Prospección', count: estadoCounts.PROSPECTO, pct: estadoCounts.PROSPECTO / totalOpp * 100, badge: 'prospecto' },
+      { label: 'Calificación', count: estadoCounts.CALIFICACION, pct: estadoCounts.CALIFICACION / totalOpp * 100, badge: 'calificacion' },
+      { label: 'Propuesta', count: estadoCounts.PROPUESTA, pct: estadoCounts.PROPUESTA / totalOpp * 100, badge: 'propuesta' },
+      { label: 'Negociación', count: estadoCounts.NEGOCIACION, pct: estadoCounts.NEGOCIACION / totalOpp * 100, badge: 'negociacion' },
+    ];
+
+    const estadosHTML = estados.map(e => `
+      <div style="display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <span class="badge badge--${e.badge}" style="min-width: 100px;"><span class="dot"></span> ${e.label}</span>
+        <div class="progress" style="flex:1;">
+          <div class="progress__bar"><div class="progress__fill" style="width: ${e.pct * 3}%"></div></div>
+        </div>
+        <span style="font-weight:700; color: var(--text-primary); min-width: 30px; text-align: right;">${e.count}</span>
+      </div>
+    `).join('');
+
+    const actividadesHTML = misActividades.map(a => `
+      <div class="activity-item">
+        <div class="activity-item__dot"></div>
+        <div class="activity-item__body">
+          <div class="activity-item__title">
+            ${a.descripcion.substring(0, 50)}${a.descripcion.length > 50 ? '...' : ''}
+            <span class="badge badge--ganada" style="font-size: 10.5px; padding: 1px 8px;">completada</span>
           </div>
-        ` : ''}
+          <div class="activity-item__desc">Lead: ${a.lead_id} · ${a.tipo}</div>
+          <div class="activity-item__meta">
+            ${Icons.clock}
+            <span>${crm.formatDate(a.fecha)}</span>
+          </div>
+        </div>
       </div>
+    `).join('');
 
-      <!-- Stat cards grid -->
-      <div style="display: grid; grid-template-columns: repeat(${bp === 'desktop' ? 4 : 2}, 1fr); gap: 12px; margin-bottom: 20px;">
-        ${statCards}
-      </div>
+    const leadsOrdenados = [...misLeads].sort((a, b) => b.score - a.score).slice(0, 3);
+    const leadsHTML = leadsOrdenados.map(l => {
+      const usuario = crm.getUsuario(l.asesor);
+      return `
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+          <div class="avatar avatar--sm avatar--accent">${l.nombre.substring(0,2).toUpperCase()}</div>
+          <div style="flex:1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${l.nombre}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">${l.intereses[0] || 'Sin interes'}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            ${Icons.fire}
+            <span style="font-weight: 700; color: var(--accent); font-size: 13px;">${l.score}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
 
-      <!-- Main content 2-column layout on desktop, stacked on mobile -->
-      <div style="display: grid; grid-template-columns: ${isCompact ? '1fr' : '1.2fr 1fr'}; gap: 16px;">
+    const isCompact = bp === 'mobile' || bp === 'tablet';
 
-        <!-- Col 1: Oportunidades por estado + Leads calientes -->
-        <div style="display: flex; flex-direction: column; gap: 16px;">
+    return `
+      <div class="content">
+        <div class="page-head">
+          <div class="page-head__title-group">
+            <div class="page-head__title">Hola, ${currentUser} 👋</div>
+            <div class="page-head__subtitle">Aquí está el resumen de tu semana comercial</div>
+          </div>
+          ${bp !== 'mobile' ? `
+            <div class="page-head__actions">
+              <button class="btn btn--secondary btn--sm">${Icons.calendar} Esta semana</button>
+              <a href="05-oportunidad-form.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+                  <button class="btn btn--primary btn--sm">${Icons.plus} Nueva oportunidad</button></a>
+            </div>
+          ` : ''}
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(${bp === 'desktop' ? 4 : 2}, 1fr); gap: 12px; margin-bottom: 20px;">
+          ${statCards}
+        </div>
+
+        <div style="display: grid; grid-template-columns: ${isCompact ? '1fr' : '1.2fr 1fr'}; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="card">
+              <div class="card__header">
+                <div>
+                  <div class="card__title">Oportunidades por estado</div>
+                  <div class="card__subtitle">Distribución de tu pipeline activo</div>
+                </div>
+                <a href="02-oportunidades-kanban.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver todas ${Icons.arrowRight}</button></a>
+              </div>
+              <div class="card__body" style="padding-top: 4px; padding-bottom: 4px;">
+                ${estadosHTML}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card__header">
+                <div>
+                  <div class="card__title">Leads más activos</div>
+                  <div class="card__subtitle">Tus prospectos con mayor probabilidad de conversión</div>
+                </div>
+                <span class="badge badge--accent">${Icons.sparkles} Top 3</span>
+              </div>
+              <div class="card__body" style="padding-top: 4px; padding-bottom: 4px;">
+                ${leadsHTML}
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card__header">
               <div>
-                <div class="card__title">Oportunidades por estado</div>
-                <div class="card__subtitle">Distribución de tu pipeline activo</div>
+                <div class="card__title">Mis últimas actividades</div>
+                <div class="card__subtitle">Registro cronológico</div>
               </div>
-              <button class="btn btn--ghost btn--sm">Ver todas ${Icons.arrowRight}</button>
+              <a href="07-actividades.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver historial</button></a>
             </div>
-            <div class="card__body" style="padding-top: 4px; padding-bottom: 4px;">
-              ${estadosHTML}
+            <div class="card__body" style="padding-top: 0; padding-bottom: 4px;">
+              ${actividadesHTML}
             </div>
-          </div>
-
-          <div class="card">
-            <div class="card__header">
-              <div>
-                <div class="card__title">Leads más activos</div>
-                <div class="card__subtitle">Tus prospectos con mayor probabilidad de conversión</div>
-              </div>
-              <span class="badge badge--accent">${Icons.sparkles} Top 3</span>
-            </div>
-            <div class="card__body" style="padding-top: 4px; padding-bottom: 4px;">
-              ${leadsHTML}
+            <div class="card__footer" style="justify-content: center;">
+              <button class="btn btn--secondary btn--block btn--sm">${Icons.plus} Registrar actividad</button>
             </div>
           </div>
         </div>
-
-        <!-- Col 2: Actividades recientes -->
-        <div class="card">
-          <div class="card__header">
-            <div>
-              <div class="card__title">Mis últimas actividades</div>
-              <div class="card__subtitle">Registro cronológico</div>
-            </div>
-            <button class="btn btn--ghost btn--sm">Ver historial</button>
-          </div>
-          <div class="card__body" style="padding-top: 0; padding-bottom: 4px;">
-            ${actividadesHTML}
-          </div>
-          <div class="card__footer" style="justify-content: center;">
-            <button class="btn btn--secondary btn--block btn--sm">${Icons.plus} Registrar actividad</button>
-          </div>
-        </div>
-
       </div>
+    `;
+  }
+
+  document.getElementById('desktop-shell').innerHTML = `
+    ${renderSidebar('dashboard', 'ejecutivo')}
+    <div class="main-area">
+      ${renderTopbar({ title: 'Mi Dashboard' })}
+      ${dashboardContent('desktop')}
     </div>
   `;
-}
 
-/* ============================================================
-   RENDERIZAR CADA BREAKPOINT
-   ============================================================ */
+  document.getElementById('tablet-shell').innerHTML = `
+    ${renderSidebar('dashboard', 'ejecutivo')}
+    <div class="main-area">
+      ${renderTopbar({ title: 'Mi Dashboard' })}
+      ${dashboardContent('tablet')}
+    </div>
+  `;
 
-// Desktop
-document.getElementById('desktop-shell').innerHTML = `
-  ${renderSidebar('dashboard', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ title: 'Mi Dashboard' })}
-    ${dashboardContent('desktop')}
-  </div>
-`;
-
-// Tablet - sidebar colapsado (72px)
-document.getElementById('tablet-shell').innerHTML = `
-  ${renderSidebar('dashboard', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ title: 'Mi Dashboard' })}
-    ${dashboardContent('tablet')}
-  </div>
-`;
-
-// Mobile - sin sidebar, con bottom nav
-document.getElementById('mobile-shell').innerHTML = `
-  <div class="main-area">
-    ${renderTopbar({ title: 'Dashboard' })}
-    ${dashboardContent('mobile')}
-    ${renderMobileBottomNav('dashboard')}
-  </div>
-`;
+  document.getElementById('mobile-shell').innerHTML = `
+    <div class="main-area">
+      ${renderTopbar({ title: 'Dashboard' })}
+      ${dashboardContent('mobile')}
+      ${renderMobileBottomNav('dashboard')}
+    </div>
+  `;
+};
 </script>
 </body>
 </html>

@@ -71,83 +71,91 @@
 </div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isCompact = bp === 'mobile' || bp === 'tablet';
+window.onCRMDataLoaded = function(crm) {
+  const allLeads = crm.data.leads;
+  const allOpp = crm.data.oportunidades;
+  const allUsuarios = crm.data.usuarios.ejecutivos;
 
-  const statCardsHTML = `
-    <div class="stat-card">
-      <div class="stat-card__icon" style="background: #FDECEA; color: var(--error);">${Icons.warning}</div>
-      <div class="stat-card__label">Alertas activas</div>
-      <div class="stat-card__value" style="color: var(--error);">5</div>
-      <div class="stat-card__subtext">2 críticas · 3 advertencias</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--accent">${Icons.clock}</div>
-      <div class="stat-card__label">Leads estancados</div>
-      <div class="stat-card__value stat-card__value--accent">8</div>
-      <div class="stat-card__subtext">+3 días sin actividad</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon">${Icons.users}</div>
-      <div class="stat-card__label">Ejecutivos monitoreados</div>
-      <div class="stat-card__value">6</div>
-      <div class="stat-card__subtext">4 con cumplimiento ≥ 80%</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card__icon stat-card__icon--success">${Icons.clipboardCheck}</div>
-      <div class="stat-card__label">Cumplimiento promedio</div>
-      <div class="stat-card__value stat-card__value--success">78%</div>
-      <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+4%</span> vs mes anterior</div>
-    </div>
-  `;
+  function content(bp) {
+    const isCompact = bp === 'mobile' || bp === 'tablet';
 
-  const alertsHTML = `
-    <div class="alert-row">
-      ${Icons.warning}
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--error); font-size: 13.5px;">Lead estancado 5 días</div>
-        <div style="font-size: 12px; color: #8a2a1d;">"Proyecto acueducto rural EMPAS" — asignado a Juan Pérez · Estado: Contactado</div>
-      </div>
-      <button class="btn btn--sm" style="background: var(--error); color: #fff;">Revisar</button>
-    </div>
-    <div class="alert-row">
-      ${Icons.warning}
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--error); font-size: 13.5px;">Oportunidad sin actividad 7 días</div>
-        <div style="font-size: 12px; color: #8a2a1d;">"Suministro anual Constructora Andina" — María G. · Estado: Negociación</div>
-      </div>
-      <button class="btn btn--sm" style="background: var(--error); color: #fff;">Revisar</button>
-    </div>
-    <div class="alert-row is-warning">
-      ${Icons.clock}
-      <div style="flex:1;">
-        <div style="font-weight:600; color: #B87E15; font-size: 13.5px;">3 leads sin contactar hace 2 días</div>
-        <div style="font-size: 12px; color: #8a5c0e;">Ejecutivos: Carlos R. (2), Ana M. (1)</div>
-      </div>
-      <button class="btn btn--sm btn--secondary">Ver detalle</button>
-    </div>
-    <div class="alert-row is-info">
-      ${Icons.bell}
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--primary); font-size: 13.5px;">12 oportunidades próximas a cerrar</div>
-        <div style="font-size: 12px; color: #1B2C6B;">Fecha estimada de cierre en los próximos 7 días</div>
-      </div>
-      <button class="btn btn--sm btn--ghost">Ver lista</button>
-    </div>
-  `;
+    const noInteresado = allLeads.filter(l => l.estado === 'No Interesado').length;
+    const estancados = allLeads.filter(l => l.estado === 'Nuevo').length;
+    const execCount = allUsuarios.filter(u => u.rol === 'ejecutivo').length;
 
-  const ejecutivos = [
-    { nombre: 'Juan Pérez', depto: 'Santander', leads: 8, opps: 12, act: 18, compliance: 85, cls: '' },
-    { nombre: 'María García', depto: 'Antioquia', leads: 5, opps: 9, act: 22, compliance: 92, cls: '' },
-    { nombre: 'Carlos Rodríguez', depto: 'Cundinamarca', leads: 10, opps: 6, act: 11, compliance: 62, cls: 'warn' },
-    { nombre: 'Ana Martínez', depto: 'Valle del Cauca', leads: 7, opps: 11, act: 16, compliance: 78, cls: '' },
-    { nombre: 'Pedro Salazar', depto: 'Atlántico', leads: 4, opps: 5, act: 8, compliance: 48, cls: 'low' },
-    { nombre: 'Laura Jiménez', depto: 'Santander', leads: 6, opps: 8, act: 14, compliance: 80, cls: '' },
-  ];
+    const statCardsHTML = `
+      <div class="stat-card">
+        <div class="stat-card__icon" style="background: #FDECEA; color: var(--error);">${Icons.warning}</div>
+        <div class="stat-card__label">Alertas activas</div>
+        <div class="stat-card__value" style="color: var(--error);">${noInteresado}</div>
+        <div class="stat-card__subtext">Leads no interesados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--accent">${Icons.clock}</div>
+        <div class="stat-card__label">Leads estancados</div>
+        <div class="stat-card__value stat-card__value--accent">${estancados}</div>
+        <div class="stat-card__subtext">Sin contactar +2 días</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon">${Icons.users}</div>
+        <div class="stat-card__label">Ejecutivos monitoreados</div>
+        <div class="stat-card__value">${execCount}</div>
+        <div class="stat-card__subtext">4 con cumplimiento ≥ 80%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--success">${Icons.clipboardCheck}</div>
+        <div class="stat-card__label">Cumplimiento promedio</div>
+        <div class="stat-card__value stat-card__value--success">78%</div>
+        <div class="stat-card__subtext"><span class="stat-card__trend stat-card__trend--up">+4%</span> vs mes anterior</div>
+      </div>
+    `;
 
-  const ejecutivosHTML = ejecutivos.map(e => `
-    <div class="ejecutivo-row">
+    const alertsHTML = `
+      <div class="alert-row">
+        ${Icons.warning}
+        <div style="flex:1;">
+          <div style="font-weight:600; color: var(--error); font-size: 13.5px;">Leads no interesados</div>
+          <div style="font-size: 12px; color: #8a2a1d;">${noInteresado} leads en estado "No Interesado"</div>
+        </div>
+        <a href="09-alertas.html" style="text-decoration: none;"><button class="btn btn--sm" style="background: var(--error); color: #fff;">Revisar</button></a>
+      </div>
+      <div class="alert-row is-warning">
+        ${Icons.clock}
+        <div style="flex:1;">
+          <div style="font-weight:600; color: #B87E15; font-size: 13.5px;">${estancados} leads sin contactar hace 2 días</div>
+          <div style="font-size: 12px; color: #8a5c0e;">Necesitan atención inmediata</div>
+        </div>
+        <a href="09-alertas.html" style="text-decoration: none;"><button class="btn btn--sm btn--secondary">Ver detalle</button></a>
+      </div>
+      <div class="alert-row is-info">
+        ${Icons.bell}
+        <div style="flex:1;">
+          <div style="font-weight:600; color: var(--primary); font-size: 13.5px;">${allOpp.filter(o => !['Cerrada Ganada','Cerrada Perdida'].includes(o.estado)).length} oportunidades activas</div>
+          <div style="font-size: 12px; color: #1B2C6B;">Pipeline en seguimiento</div>
+        </div>
+        <a href="02-oportunidades-kanban.html" style="text-decoration: none;"><button class="btn btn--sm btn--ghost">Ver lista</button></a>
+      </div>
+    `;
+
+    const metricas = crm.getMetricas();
+    const leadsPorAsesor = metricas?.leads_por_asesor || [];
+    const ejecutivos = allUsuarios.filter(u => u.rol === 'ejecutivo').map((u, i) => {
+      const m = leadsPorAsesor.find(l => l.asesor === u.nombre);
+      return {
+        nombre: u.nombre,
+        depto: u.departamento,
+        leads: m?.count || 0,
+        opps: crm.getOportunidades({asesor: u.nombre}).length,
+        act: crm.getActividades({asesor: u.nombre}).length,
+        compliance: Math.floor(Math.random() * 40) + 60,
+        cls: ''
+      };
+    });
+
+    const ejecutivosHTML = ejecutivos.map(e => `
+      <div class="ejecutivo-row">
       <div class="avatar avatar--sm avatar--color-${Math.floor(Math.random()*6)+1}">${e.nombre.split(' ').map(x=>x[0]).join('')}</div>
       <div>
         <div style="font-weight: 600; font-size: 13.5px; color: var(--text-primary);">${e.nombre}</div>
@@ -203,7 +211,7 @@ function content(bp) {
               <div class="card__title">Equipo comercial</div>
               <div class="card__subtitle">Cumplimiento y actividad por ejecutivo</div>
             </div>
-            <button class="btn btn--ghost btn--sm">Ver todos ${Icons.arrowRight}</button>
+            <a href="03-monitoreo-mapa-notif.html" style="text-decoration: none; color: inherit;"><button class="btn btn--ghost btn--sm">Ver todos ${Icons.arrowRight}</button></a>
           </div>
           <div style="padding: 4px 0;">
             ${ejecutivosHTML}
@@ -221,7 +229,9 @@ function content(bp) {
           </div>
           <div class="card__body">
             ${alertsHTML}
-            <button class="btn btn--secondary btn--block" style="margin-top: 12px;">Ver todas las alertas</button>
+            <a href="09-alertas.html" style="text-decoration: none; color: inherit;">
+              <button class="btn btn--secondary btn--block" style="margin-top: 12px;">Ver todas las alertas</button>
+            </a>
           </div>
         </div>
       </div>
@@ -286,7 +296,7 @@ function content(bp) {
 }
 
 document.getElementById('d').innerHTML = `${renderSidebar('dashboard','coordinador')}<div class="main-area">${renderTopbar({title:'Panel de seguimiento'})}${content('desktop')}</div>`;
-document.getElementById('t').innerHTML = `${renderSidebar('dashboard','coordinador')}<div class="main-area">${renderTopbar({title:'Seguimiento'})}${content('tablet')}</div>`;
+};
 </script>
 </body>
 </html>

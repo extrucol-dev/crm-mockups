@@ -2,151 +2,166 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRM Extrucol · Ejecutivo · Detalle Lead + Conversión</title>
+<title>CRM Extrucol · Ejecutivo · Convertir Lead a Oportunidad</title>
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 24px; }
-  .canvas-section-title { font: 700 15px 'Roboto'; color: #24388C; margin: 40px 0 20px; padding: 8px 14px; background: #fff; border: 1px solid #E5E5E5; border-radius: 6px; display: inline-block; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; margin-bottom: 30px; }
-  .bp-col { display: flex; flex-direction: column; }
-
-  /* Modal */
-  .modal-overlay {
-    position: absolute; inset: 0;
-    background: rgba(26,26,26,0.5);
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 60px 24px;
-    z-index: 100;
-  }
-  .modal-content {
-    background: var(--surface);
-    border-radius: 12px;
-    max-width: 560px; width: 100%;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    overflow: hidden;
-  }
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .modal-header__icon {
-    width: 40px; height: 40px;
-    background: var(--success-bg); color: var(--success);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    margin-right: 12px;
-  }
-  .modal-body { padding: 20px 24px; }
-  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: var(--page-bg); }
-
-  .convert-preview {
-    background: var(--page-bg);
-    border: 1px dashed var(--primary);
-    border-radius: 8px;
-    padding: 14px;
-    margin-top: 12px;
-  }
-  .convert-arrow {
-    display: flex; align-items: center; justify-content: center;
-    padding: 12px;
-    color: var(--primary);
-  }
-  .convert-arrow svg { width: 24px; height: 24px; }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
 </style>
 </head>
 <body>
-<div>
-  <div>
-
-    <div>
-      <div><div style="height: 900px; position: relative;" id="d-conv"></div></div>
-    </div>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
+const currentUser = 'PAOLA';
+let lead = null;
+let formState = { nombre: '', valor: '', fecha_cierre: '', estado: 'Prospeccion' };
 
-function conversionModal(bp) {
-  return `
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast is-' + type;
+  t.style.display = 'flex';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
 
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div style="display: flex; align-items: center;">
-            <div class="modal-header__icon">${Icons.arrowRight}</div>
-            <div>
-              <div style="font-weight: 700; font-size: 16px;">Convertir a oportunidad</div>
-              <div style="font-size: 12.5px; color: var(--text-muted);">Crea una oportunidad comercial desde este lead</div>
-            </div>
-          </div>
-          <button class="topbar__icon-btn">${Icons.close}</button>
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+window.onCRMDataLoaded = function(crm) {
+  const params = new URLSearchParams(window.location.search);
+  const leadId = params.get('id') || params.get('lead_id');
+  lead = leadId ? crm.getLeadById(leadId) : null;
+  if (!lead) { lead = crm.data.leads[0]; }
+
+  formState.nombre = lead.nombre + ' - ' + lead.empresa;
+  formState.valor = lead.valor ? String(lead.valor) : '0';
+  const d = new Date(); d.setMonth(d.getMonth() + 3);
+  formState.fecha_cierre = d.toISOString().split('T')[0];
+
+  render(crm);
+};
+
+function render(crm) {
+  const sixMonths = new Date(); sixMonths.setMonth(sixMonths.getMonth() + 6);
+  const cierreDefault = sixMonths.toISOString().split('T')[0];
+
+  const html = `
+    <div class="content" style="padding-top: 16px;">
+      <div class="page-head">
+        <div class="page-head__title-group">
+          <div class="page-head__title">Convertir lead a oportunidad</div>
+          <div class="page-head__subtitle">${lead.id} · ${lead.nombre}</div>
         </div>
-        <div class="modal-body">
-          <!-- Preview de conversión -->
-          <div class="convert-preview">
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
-              ${Icons.funnel.replace('class="icon"','class="icon icon--xs"')} Lead origen
+        <a href="10-lead-detalle.html?id=${lead.id}" style="text-decoration:none;">
+          <button class="btn btn--secondary btn--sm">${Icons.arrowLeft} Volver al lead</button>
+        </a>
+      </div>
+
+      <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+        <div class="card">
+          <div class="card__header"><div class="card__title">Lead de origen</div></div>
+          <div class="card__body">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div class="avatar avatar--lg avatar--color-1">${(lead.nombre||'CN').substring(0,2).toUpperCase()}</div>
+              <div>
+                <div style="font-weight: 700; font-size: 15px;">${lead.nombre}</div>
+                <div style="font-size: 12px; color: var(--text-muted);">${lead.empresa} · ${lead.ciudad}</div>
+              </div>
             </div>
-            <div style="font-weight: 700;">Suministro anual de tubería</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Constructora Bolívar · Score 86</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span class="badge badge--info">${lead.origen}</span>
+              <span class="badge badge--${lead.estado === 'Interesado' ? 'propuesta' : 'info'}">${lead.estado}</span>
+              <span class="badge badge--accent">${Icons.fire.replace('class="icon"','class="icon icon--xs"')} ${lead.score} pts</span>
+            </div>
+            ${lead.intereses && lead.intereses.length > 0 ? `<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+              ${lead.intereses.map(i => `<span class="chip chip-sm">${i}</span>`).join('')}
+            </div>` : ''}
           </div>
+        </div>
 
-          <div class="convert-arrow">${Icons.chevronDown}</div>
-
-          <div class="form-field" style="margin-bottom: 12px;">
-            <label class="form-field__label">Título de la oportunidad <span class="req">*</span></label>
-            <input class="input" value="Contrato anual - Constructora Bolívar 2026" />
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-field">
-              <label class="form-field__label">Tipo</label>
-              <select class="select">
-                <option>Suministro directo</option>
-                <option>Licitación</option>
-                <option>Proyecto a medida</option>
-              </select>
+        <div class="card">
+          <div class="card__header"><div class="card__title">Datos de la oportunidad</div></div>
+          <div class="card__body" style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-field" style="margin: 0;">
+              <label class="form-field__label">Titulo de la oportunidad <span style="color:var(--error)">*</span></label>
+              <input class="input" id="conv-nombre" value="${esc(formState.nombre)}" oninput="formState.nombre=this.value" />
             </div>
-            <div class="form-field">
-              <label class="form-field__label">Valor estimado (COP)</label>
-              <input class="input" value="$ 560.000.000" />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-field" style="margin: 0;">
+                <label class="form-field__label">Valor estimado (COP)</label>
+                <input class="input" type="number" id="conv-valor" value="${formState.valor}" oninput="formState.valor=this.value" placeholder="0" />
+              </div>
+              <div class="form-field" style="margin: 0;">
+                <label class="form-field__label">Fecha cierre estimada</label>
+                <input class="input" type="date" id="conv-cierre" value="${formState.fecha_cierre || cierreDefault}" oninput="formState.fecha_cierre=this.value" />
+              </div>
             </div>
-            <div class="form-field">
-              <label class="form-field__label">Fecha cierre estimada</label>
-              <input class="input" type="date" value="2026-05-30" />
-            </div>
-            <div class="form-field">
+            <div class="form-field" style="margin: 0;">
               <label class="form-field__label">Estado inicial</label>
-              <select class="select">
-                <option selected>Prospección</option>
-                <option>Calificación</option>
+              <select class="select" id="conv-estado" onchange="formState.estado=this.value" style="width:100%;">
+                <option value="Prospeccion" ${formState.estado==='Prospeccion'?'selected':''}>Prospeccion</option>
+                <option value="Calificacion" ${formState.estado==='Calificacion'?'selected':''}>Calificacion</option>
+                <option value="Propuesta" ${formState.estado==='Propuesta'?'selected':''}>Propuesta</option>
               </select>
             </div>
           </div>
-
-          <div class="alert alert--info">
-            ${Icons.sparkles}
-            <div>
-              Se creará una nueva oportunidad y este lead se marcará como <strong>Calificado</strong>.
-              Los intereses del lead se usarán para pre-seleccionar productos.
-            </div>
-          </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn--secondary">Cancelar</button>
-          <button class="btn btn--primary">${Icons.check} Convertir a oportunidad</button>
+
+        <div class="alert alert--info">
+          ${Icons.sparkles}
+          <div>Se creara una oportunidad y el lead mantendra su estado actual.</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <a href="10-lead-detalle.html?id=${lead.id}" style="text-decoration:none;">
+            <button class="btn btn--secondary">Cancelar</button>
+          </a>
+          <button class="btn btn--primary" style="background: var(--success);" onclick="convertirLead()">
+            ${Icons.check} Convertir a oportunidad
+          </button>
         </div>
       </div>
     </div>
   `;
+
+  document.getElementById('desktop-shell').innerHTML =
+    renderSidebar('leads', 'ejecutivo') +
+    '<div class="main-area">' +
+      renderTopbar({ breadcrumb: ['Leads', lead.id, 'Convertir'] }) +
+      html +
+    '</div>';
 }
 
-
-document.getElementById('d-conv').innerHTML = `<div class="app-shell">${conversionModal('desktop')}</div>`;
-document.getElementById('m-conv').innerHTML = `<div class="app-shell is-mobile">${conversionModal('mobile')}</div>`;
+function convertirLead() {
+  if (!formState.nombre.trim()) { showToast('El titulo es obligatorio', 'error'); return; }
+  const valorNum = parseInt(formState.valor) || 0;
+  const opp = CRMData.addOportunidad({
+    nombre: formState.nombre.trim(),
+    empresa: lead.empresa,
+    lead_id: lead.id,
+    contacto: lead.nombre,
+    estado: formState.estado,
+    valor: valorNum,
+    fecha_cierre: formState.fecha_cierre || '',
+    origen: lead.origen,
+    asesor: currentUser
+  });
+  if (!opp) { showToast('Error al crear oportunidad', 'error'); return; }
+  CRMData.recalculateMetricas();
+  showToast('Oportunidad creada: ' + opp.id, 'success');
+  setTimeout(() => { window.location.href = '04-oportunidad-detalle.html?id=' + opp.id; }, 1500);
+}
 </script>
 </body>
 </html>

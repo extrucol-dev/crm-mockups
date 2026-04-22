@@ -44,40 +44,58 @@
 </div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isMobile = bp === 'mobile';
+window.onCRMDataLoaded = function(crm) {
+  function content(bp) {
+    const isMobile = bp === 'mobile';
 
-  const leadsEstancados = [
-    { type: 'LEAD', id: 'LEAD-234', title: 'Consulta portafolio riego', empresa: 'Agroindustria Llanera', ejec: 'Juan Pérez', color: 1, estado: 'Contactado', badge: 'propuesta', dias: 5, umbral: 3, priority: 'danger' },
-    { type: 'LEAD', id: 'LEAD-231', title: 'Cotización tubería PE', empresa: 'Constructora XYZ', ejec: 'Carlos R.', color: 3, estado: 'Nuevo', badge: 'prospecto', dias: 4, umbral: 3, priority: 'warning' },
-    { type: 'LEAD', id: 'LEAD-228', title: 'Interesado en accesorios', empresa: 'Distribuidora del Sur', ejec: 'Pedro S.', color: 5, estado: 'Nuevo', badge: 'prospecto', dias: 6, umbral: 3, priority: 'danger' },
-    { type: 'LEAD', id: 'LEAD-225', title: 'Red residencial sector 12', empresa: 'Ferretería Central', ejec: 'Carlos R.', color: 3, estado: 'Contactado', badge: 'propuesta', dias: 4, umbral: 3, priority: 'warning' },
-  ];
+    const leadsEstancados = crm.getLeads({ estado: 'Nuevo' }).map((l, i) => ({
+      type: 'LEAD',
+      id: l.id,
+      title: l.nombre,
+      empresa: l.empresa,
+      ejec: l.asesor,
+      color: (i % 6) + 1,
+      estado: l.estado,
+      badge: 'prospecto',
+      dias: parseInt(crm.getDaysAgo(l.fecha_creacion)) || 3,
+      umbral: 3,
+      priority: 'warning'
+    }));
 
-  const oppEstancadas = [
-    { type: 'OPP', id: 'OPP-0038', title: 'Suministro anual tubería', empresa: 'Constructora Andina', ejec: 'María G.', color: 2, estado: 'Negociación', badge: 'negociacion', dias: 14, umbral: 7, priority: 'danger', valor: '$ 560 M' },
-    { type: 'OPP', id: 'OPP-0024', title: 'Riego Palmales Fase 2', empresa: 'Palmares del Sur', ejec: 'Juan P.', color: 1, estado: 'Propuesta', badge: 'propuesta', dias: 9, umbral: 7, priority: 'warning', valor: '$ 125 M' },
-    { type: 'OPP', id: 'OPP-0021', title: 'Ampliación red gas', empresa: 'Hidrogas Oriente', ejec: 'Pedro S.', color: 5, estado: 'Calificación', badge: 'calificacion', dias: 11, umbral: 7, priority: 'danger', valor: '$ 95 M' },
-  ];
+    const oppEstancadas = crm.getOportunidades({ estado: 'Propuesta' }).map((o, i) => ({
+      type: 'OPP',
+      id: o.id,
+      title: o.nombre,
+      empresa: o.empresa,
+      ejec: o.asesor,
+      color: (i % 6) + 1,
+      estado: o.estado,
+      badge: 'propuesta',
+      dias: 9 + i,
+      umbral: 7,
+      priority: 'warning',
+      valor: crm.formatCurrency(o.valor).replace('COP', '').trim()
+    }));
 
-  const allStancados = [...leadsEstancados, ...oppEstancadas].sort((a,b) => b.dias - a.dias);
+    const allStancados = [...leadsEstancados, ...oppEstancadas].sort((a,b) => b.dias - a.dias);
 
-  if (isMobile) {
-    return `
-      <div class="content">
-        <div class="page-head">
-          <div class="page-head__title-group">
-            <div class="page-head__title">Estancados</div>
-            <div class="page-head__subtitle">${allStancados.length} registros sin movimiento</div>
+    if (isMobile) {
+      return `
+        <div class="content">
+          <div class="page-head">
+            <div class="page-head__title-group">
+              <div class="page-head__title">Estancados</div>
+              <div class="page-head__subtitle">${allStancados.length} registros sin movimiento</div>
+            </div>
           </div>
-        </div>
 
-        <div class="tabs" style="overflow-x: auto;">
-          <a class="tab is-active" style="flex-shrink: 0;">Todos <span class="tab__count">${allStancados.length}</span></a>
-          <a class="tab" style="flex-shrink: 0;">Leads <span class="tab__count">${leadsEstancados.length}</span></a>
-          <a class="tab" style="flex-shrink: 0;">Opp. <span class="tab__count">${oppEstancadas.length}</span></a>
-        </div>
+          <div class="tabs" style="overflow-x: auto;">
+            <a class="tab is-active" style="flex-shrink: 0;">Todos <span class="tab__count">${allStancados.length}</span></a>
+            <a class="tab" style="flex-shrink: 0;">Leads <span class="tab__count">${leadsEstancados.length}</span></a>
+            <a class="tab" style="flex-shrink: 0;">Opp. <span class="tab__count">${oppEstancadas.length}</span></a>
+          </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
           ${allStancados.map(r => `
@@ -194,10 +212,10 @@ function content(bp) {
               <span class="dias-badge dias-badge--${r.priority}">${Icons.clock.replace('class="icon"','class="icon icon--xs"')} ${r.dias} días</span>
               <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px;">Umbral: ${r.umbral}d</div>
             </div>
-            <div style="text-align: right; display: flex; gap: 4px; justify-content: flex-end;">
-              <button class="btn btn--ghost btn--sm" title="Notificar">${Icons.bell}</button>
-              <button class="btn btn--ghost btn--sm" title="Reasignar">${Icons.users}</button>
-              <a href="../ejecutivo/04-oportunidad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
+<div style="text-align: right; display: flex; gap: 4px; justify-content: flex-end;">
+              <a href="09-alertas.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm" title="Notificar">${Icons.bell}</button></a>
+              <a href="09-perfil-ejecutivo.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm" title="Reasignar">${Icons.users}</button></a>
+              <a href="../ejecutivo/04-oportunidad-detalle.html" style="text-decoration: none;">
                 <button class="btn btn--ghost btn--sm" title="Ver">${Icons.chevronRight}</button>
               </a>
             </div>
@@ -209,8 +227,7 @@ function content(bp) {
 }
 
 document.getElementById('d').innerHTML = `${renderSidebar('estancados','coordinador')}<div class="main-area">${renderTopbar({title:'Registros estancados'})}${content('desktop')}</div>`;
-document.getElementById('t').innerHTML = `${renderSidebar('estancados','coordinador')}<div class="main-area">${renderTopbar({title:'Estancados'})}${content('tablet')}</div>`;
-document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Estancados', actions:`<button class="topbar__icon-btn">${Icons.filter}</button>`})}${content('mobile')}</div>`;
+};
 </script>
 </body>
 </html>

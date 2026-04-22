@@ -2,357 +2,220 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRM Extrucol · Ejecutivo · Detalle Lead + Conversión</title>
+<title>CRM Extrucol · Ejecutivo · Detalle Lead</title>
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 24px; }
-  .canvas-section-title { font: 700 15px 'Roboto'; color: #24388C; margin: 40px 0 20px; padding: 8px 14px; background: #fff; border: 1px solid #E5E5E5; border-radius: 6px; display: inline-block; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; margin-bottom: 30px; }
-  .bp-col { display: flex; flex-direction: column; }
-
-  /* Modal */
-  .modal-overlay {
-    position: absolute; inset: 0;
-    background: rgba(26,26,26,0.5);
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 60px 24px;
-    z-index: 100;
-  }
-  .modal-content {
-    background: var(--surface);
-    border-radius: 12px;
-    max-width: 560px; width: 100%;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    overflow: hidden;
-  }
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .modal-header__icon {
-    width: 40px; height: 40px;
-    background: var(--success-bg); color: var(--success);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    margin-right: 12px;
-  }
-  .modal-body { padding: 20px 24px; }
-  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: var(--page-bg); }
-
-  .convert-preview {
-    background: var(--page-bg);
-    border: 1px dashed var(--primary);
-    border-radius: 8px;
-    padding: 14px;
-    margin-top: 12px;
-  }
-  .convert-arrow {
-    display: flex; align-items: center; justify-content: center;
-    padding: 12px;
-    color: var(--primary);
-  }
-  .convert-arrow svg { width: 24px; height: 24px; }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
 </style>
 </head>
 <body>
-<div>
-  <div>
-    <div>
-      <div><div><div class="app-shell" id="d-det"></div></div></div>
-    </div>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function detailContent(bp) {
-  const isCompact = bp === 'mobile' || bp === 'tablet';
+const currentUser = 'PAOLA';
 
-  const header = `
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;">
-      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-        <a style="color: var(--primary); cursor: pointer;">Leads</a>
-        <span>/</span>
-        <span>LEAD-2026-0234</span>
-      </div>
-      <div style="display: flex; justify-content: space-between; gap: 16px; ${bp === 'mobile' ? 'flex-direction: column;' : ''}">
-        <div style="flex: 1;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
-            <span class="badge badge--calificacion"><span class="dot"></span> Interesado</span>
-            <span class="badge badge--info">${Icons.globe.replace('class="icon"','class="icon icon--xs"')} Página Web</span>
-            <span class="badge badge--accent">${Icons.fire.replace('class="icon"','class="icon icon--xs"')} Score 86</span>
-          </div>
-          <div style="font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">
-            Suministro anual de tubería
-          </div>
-          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-            Constructora Bolívar · Recibido hace 7 días
-          </div>
-        </div>
-        ${bp !== 'mobile' ? `
-          <div style="display: flex; gap: 8px; flex-shrink: 0;">
-            <a href="https://ejemplo.com" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
-            </a>
-            <a href="https://ejemplo.com" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--secondary btn--sm">${Icons.xCircle} Descalificar</button>
-            </a>
-            <a href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--primary btn--sm" style="background: var(--success);">${Icons.arrowRight} Convertir a oportunidad</button>
-            </a>
-            
-          </div>
-        ` : `<button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.arrowRight} Convertir</button>`}
-      </div>
-    </div>
-  `;
-
-  const interesesHTML = `
-    <div class="card">
-      <div class="card__header">
-        <div class="card__title">Intereses del lead</div>
-        <span class="badge badge--info">3 seleccionados</span>
-      </div>
-      <div class="card__body" style="display: flex; flex-wrap: wrap; gap: 8px;">
-        <span class="badge badge--info" style="padding: 6px 12px;">${Icons.tag.replace('class="icon"','class="icon icon--xs"')} Tubería PE100</span>
-        <span class="badge badge--info" style="padding: 6px 12px;">${Icons.tag.replace('class="icon"','class="icon icon--xs"')} Accesorios PE</span>
-        <span class="badge badge--info" style="padding: 6px 12px;">${Icons.tag.replace('class="icon"','class="icon icon--xs"')} Asesoría técnica</span>
-      </div>
-    </div>
-  `;
-
-  const historialHTML = `
-    <div class="card">
-      <div class="card__header">
-        <div class="card__title">Historial de estados</div>
-      </div>
-      <div class="card__body">
-        <div class="timeline">
-          <div class="timeline__item">
-            <div class="timeline__dot"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Interesado</div>
-              <span class="timeline__date">Hoy</span>
-            </div>
-            <div class="timeline__desc">Acordó reunión técnica para definir volúmenes</div>
-          </div>
-          <div class="timeline__item">
-            <div class="timeline__dot timeline__dot--muted"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Contactado</div>
-              <span class="timeline__date">Hace 3 días</span>
-            </div>
-            <div class="timeline__desc">Primera llamada con el departamento de compras</div>
-          </div>
-          <div class="timeline__item">
-            <div class="timeline__dot timeline__dot--muted"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Nuevo</div>
-              <span class="timeline__date">Hace 7 días</span>
-            </div>
-            <div class="timeline__desc">Lead creado desde formulario web</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const sidePanel = `
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <div class="card">
-        <div class="card__header"><div class="card__title">Contacto</div></div>
-        <div class="card__body">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-            <div class="avatar avatar--color-2">PB</div>
-            <div>
-              <div style="font-weight: 700;">Pedro Bolívar</div>
-              <div style="font-size: 12px; color: var(--text-muted);">Gerente de Compras</div>
-            </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
-            <a style="color: var(--primary); display: flex; align-items: center; gap: 6px; cursor: pointer;">${Icons.phone} +57 315 789 0123</a>
-            <a style="color: var(--primary); display: flex; align-items: center; gap: 6px; cursor: pointer;">${Icons.envelope} p.bolivar@cbolivar.co</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__header"><div class="card__title">Información</div></div>
-        <div class="card__body">
-          <dl class="detail-info-list">
-            <dt>Origen</dt><dd>Página Web</dd>
-            <dt>Empresa</dt><dd>Constructora Bolívar</dd>
-            <dt>Ejecutivo</dt><dd>Juan Pérez</dd>
-            <dt>Score</dt><dd style="color: var(--accent); font-weight: 700;">86 / 100</dd>
-            <dt>Edad</dt><dd>7 días</dd>
-            <dt>Próximo seguim.</dt><dd>Mañana 10am</dd>
-          </dl>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__header"><div class="card__title">Acciones</div></div>
-        <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
-            <a href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--primary btn--sm" style="background: var(--success); width: 100%;">${Icons.arrowRight} Convertir a oportunidad</button>
-            </a>
-          <button class="btn btn--secondary btn--block">${Icons.arrowRight} Trasladar a distribuidor</button>
-          <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Descalificar lead</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const actividadesHTML = `
-    <div class="card">
-      <div class="card__header">
-        <div>
-          <div class="card__title">Actividades</div>
-          <div class="card__subtitle">3 registradas</div>
-        </div>
-        <button class="btn btn--ghost btn--sm">${Icons.plus}</button>
-      </div>
-      <div class="card__body">
-        <div class="timeline">
-          <div class="timeline__item">
-            <div class="timeline__dot timeline__dot--success"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Llamada de seguimiento</div>
-              <span class="timeline__date">Hoy, 10am</span>
-            </div>
-            <div class="timeline__desc">Cliente confirmó interés en visita técnica</div>
-            <div style="display: flex; gap: 6px; margin-top: 6px;">
-              <span class="badge badge--neutral">${Icons.phone.replace('class="icon"','class="icon icon--xs"')} Llamada</span>
-              <span class="badge badge--ganada"><span class="dot"></span> Completada</span>
-            </div>
-          </div>
-          <div class="timeline__item">
-            <div class="timeline__dot timeline__dot--success"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Email - envío de portafolio</div>
-              <span class="timeline__date">Hace 5 días</span>
-            </div>
-            <div class="timeline__desc">Envío de catálogo técnico de tubería PE100</div>
-          </div>
-          <div class="timeline__item">
-            <div class="timeline__dot"></div>
-            <div class="timeline__header">
-              <div class="timeline__title">Primer contacto web</div>
-              <span class="timeline__date">Hace 7 días</span>
-            </div>
-            <div class="timeline__desc">Formulario de contacto en página web</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  return `
-    <div class="content">
-      ${header}
-      <div style="display: grid; gap: 16px; ${isCompact ? '' : 'grid-template-columns: 1fr 320px;'}">
-        <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
-          ${interesesHTML}
-          ${actividadesHTML}
-          ${historialHTML}
-        </div>
-        ${sidePanel}
-      </div>
-    </div>
-  `;
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.className = 'toast is-' + type;
+  toast.style.display = 'flex';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
 }
 
-function conversionModal(bp) {
-  return `
-    ${renderSidebar('leads','ejecutivo')}
-    <div class="main-area">
-      ${renderTopbar({title:'Leads'})}
-      <div class="content">
-        <div style="font-size: 13px; color: var(--text-muted);">Vista con modal de conversión superpuesta</div>
+window.onCRMDataLoaded = function(crm) {
+  const params = new URLSearchParams(window.location.search);
+  const leadId = params.get('id') || 'L007';
+  const lead = crm.data.leads.find(l => l.id === leadId) || crm.data.leads[0];
+  const origenColor = crm.getOrigenColor(lead.origen);
+  const usuario = crm.getUsuario(lead.asesor);
+
+  const leadActs = crm.getActividades({ lead_id: lead.id });
+  const actCount = leadActs.length;
+  const tipoColorMap = { VISITA: 'visita', LLAMADA: 'llamada', EMAIL: 'email', REUNION: 'reunion' };
+  const tipoIconMap = { VISITA: 'mapPin', LLAMADA: 'phone', EMAIL: 'envelope', REUNION: 'view' };
+
+  const actividadesHTML = actCount > 0 ? `<div class="card">
+    <div class="card__header">
+      <div><div class="card__title">Actividades</div><div class="card__subtitle">${actCount} registrada${actCount !== 1 ? 's' : ''}</div></div>
+      <a href="07-actividades.html" style="text-decoration:none;"><button class="btn btn--ghost btn--sm">${Icons.plus}</button></a>
+    </div>
+    <div class="card__body">
+      <div class="timeline">
+        ${leadActs.slice(0, 5).map((a, i) => `<div class="timeline__item">
+          <div class="timeline__dot ${a.completada ? 'timeline__dot--success' : ''}"></div>
+          <div class="timeline__header">
+            <div class="timeline__title">${a.descripcion.substring(0, 60)}${a.descripcion.length > 60 ? '...' : ''}</div>
+            <span class="timeline__date">${crm.formatDate(a.fecha)}</span>
+          </div>
+          <div class="timeline__desc">${a.notas || ''}</div>
+          <div style="display: flex; gap: 6px; margin-top: 6px;">
+            <span class="badge badge--${tipoColorMap[a.tipo] || 'neutral'}">${(Icons[tipoIconMap[a.tipo]] || Icons.view).replace('class="icon"','class="icon icon--xs"')} ${a.tipo}</span>
+            ${a.completada ? '<span class="badge badge--ganada"><span class="dot"></span> Completada</span>' : '<span class="badge badge--prospecto"><span class="dot"></span> Pendiente</span>'}
+          </div>
+        </div>`).join('')}
       </div>
     </div>
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div style="display: flex; align-items: center;">
-            <div class="modal-header__icon">${Icons.arrowRight}</div>
-            <div>
-              <div style="font-weight: 700; font-size: 16px;">Convertir a oportunidad</div>
-              <div style="font-size: 12.5px; color: var(--text-muted);">Crea una oportunidad comercial desde este lead</div>
-            </div>
+  </div>` : `<div class="card"><div class="card__header"><div class="card__title">Actividades</div></div><div class="card__body" style="color:var(--text-muted);text-align:center;padding:24px;">Sin actividades registradas</div></div>`;
+
+  const interesesHTML = `<div class="card">
+    <div class="card__header">
+      <div class="card__title">Intereses del lead</div>
+      <span class="badge badge--info">${lead.intereses.length} seleccionados</span>
+    </div>
+    <div class="card__body" style="display: flex; flex-wrap: wrap; gap: 8px;">
+      ${lead.intereses.map(i => `<span class="badge badge--info" style="padding: 6px 12px;">${Icons.tag.replace('class="icon"','class="icon icon--xs"')} ${i}</span>`).join('')}
+    </div>
+  </div>`;
+
+  const historialHTML = `<div class="card">
+    <div class="card__header"><div class="card__title">Historial de estados</div></div>
+    <div class="card__body">
+      <div class="timeline">
+        ${lead.comentarios.slice().reverse().map((c, i) => `
+        <div class="timeline__item">
+          <div class="timeline__dot ${i > 0 ? 'timeline__dot--muted' : ''}"></div>
+          <div class="timeline__header">
+            <div class="timeline__title">${lead.estado}</div>
+            <span class="timeline__date">${crm.formatDate(c.fecha)}</span>
           </div>
-          <button class="topbar__icon-btn">${Icons.close}</button>
+          <div class="timeline__desc">${c.texto}</div>
         </div>
-        <div class="modal-body">
-          <!-- Preview de conversión -->
-          <div class="convert-preview">
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
-              ${Icons.funnel.replace('class="icon"','class="icon icon--xs"')} Lead origen
-            </div>
-            <div style="font-weight: 700;">Suministro anual de tubería</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Constructora Bolívar · Score 86</div>
-          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
 
-          <div class="convert-arrow">${Icons.chevronDown}</div>
-
-          <div class="form-field" style="margin-bottom: 12px;">
-            <label class="form-field__label">Título de la oportunidad <span class="req">*</span></label>
-            <input class="input" value="Contrato anual - Constructora Bolívar 2026" />
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-field">
-              <label class="form-field__label">Tipo</label>
-              <select class="select">
-                <option>Suministro directo</option>
-                <option>Licitación</option>
-                <option>Proyecto a medida</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Valor estimado (COP)</label>
-              <input class="input" value="$ 560.000.000" />
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Fecha cierre estimada</label>
-              <input class="input" type="date" value="2026-05-30" />
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Estado inicial</label>
-              <select class="select">
-                <option selected>Prospección</option>
-                <option>Calificación</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="alert alert--info">
-            ${Icons.sparkles}
-            <div>
-              Se creará una nueva oportunidad y este lead se marcará como <strong>Calificado</strong>.
-              Los intereses del lead se usarán para pre-seleccionar productos.
-            </div>
+  const sidePanel = `<div style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="card">
+      <div class="card__header"><div class="card__title">Contacto</div></div>
+      <div class="card__body">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div class="avatar avatar--color-2">${lead.nombre.substring(0,2).toUpperCase()}</div>
+          <div>
+            <div style="font-weight: 700;">${lead.nombre}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">${lead.empresa}</div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn--secondary">Cancelar</button>
-            <a class="btn btn--primary btn--sm"  href="16-lead-conversion.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--primary btn--sm" style="background: var(--success); width: 100%;">${Icons.arrowRight} Convertir a oportunidad</button>
-            </a>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          ${lead.telefono ? `<a style="color: var(--primary); display: flex; align-items: center; gap: 6px; cursor: pointer;">${Icons.phone} ${lead.telefono}</a>` : ''}
+          ${lead.email ? `<a style="color: var(--primary); display: flex; align-items: center; gap: 6px; cursor: pointer;">${Icons.envelope} ${lead.email}</a>` : ''}
         </div>
       </div>
     </div>
-  `;
-}
 
-document.getElementById('d-det').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Detalle']})}${detailContent('desktop')}</div>`;
-document.getElementById('t-det').innerHTML = `${renderSidebar('leads','ejecutivo')}<div class="main-area">${renderTopbar({breadcrumb:['Leads','Detalle']})}${detailContent('tablet')}</div>`;
-document.getElementById('m-det').innerHTML = `<div class="main-area">${renderTopbar({title:'Lead', actions:`<button class="topbar__icon-btn">${Icons.pencil}</button>`})}${detailContent('mobile')}${renderMobileBottomNav('leads')}</div>`;
+    <div class="card">
+      <div class="card__header"><div class="card__title">Informacion</div></div>
+      <div class="card__body">
+        <dl class="detail-info-list">
+          <dt>Origen</dt><dd>${lead.origen}</dd>
+          <dt>Empresa</dt><dd>${lead.empresa}</dd>
+          <dt>Ciudad</dt><dd>${lead.ciudad}</dd>
+          <dt>Ejecutivo</dt><dd>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div class="avatar avatar--xs" style="background:${usuario?.color || '#6B7280'}">${lead.asesor.substring(0,2)}</div>
+              <span>${lead.asesor}</span>
+            </div>
+          </dd>
+          <dt>Score</dt><dd style="color: var(--accent); font-weight: 700;">${lead.score} / 100</dd>
+          <dt>Edad</dt><dd>${crm.getDaysAgo(lead.fecha_creacion)}</dd>
+          <dt>Tipo</dt><dd><span class="badge badge--${lead.tipo_cliente === 'ACTIVO' ? 'ganada' : 'info'}">${lead.tipo_cliente}</span></dd>
+        </dl>
+      </div>
+    </div>
 
-document.getElementById('d-conv').innerHTML = `<div class="app-shell">${conversionModal('desktop')}</div>`;
-document.getElementById('m-conv').innerHTML = `<div class="app-shell is-mobile">${conversionModal('mobile')}</div>`;
+    <div class="card">
+      <div class="card__header"><div class="card__title">Estado del lead</div></div>
+      <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="form-field" style="margin: 0;">
+          <label class="form-field__label">Cambiar estado</label>
+          <select class="select" id="lead-estado-select" onchange="actualizarEstadoLead('${lead.id}', this.value)">
+            <option value="Nuevo" ${lead.estado === 'Nuevo' ? 'selected' : ''}>Nuevo</option>
+            <option value="Contactado" ${lead.estado === 'Contactado' ? 'selected' : ''}>Contactado</option>
+            <option value="Interesado" ${lead.estado === 'Interesado' ? 'selected' : ''}>Interesado</option>
+            <option value="Enviado a distribuidor" ${lead.estado === 'Enviado a distribuidor' ? 'selected' : ''}>Enviado a distribuidor</option>
+            <option value="No Interesado" ${lead.estado === 'No Interesado' ? 'selected' : ''}>No Interesado</option>
+          </select>
+        </div>
+        <div id="estado-msg" style="font-size:12px;color:var(--success);display:none;">Estado actualizado</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__header"><div class="card__title">Acciones</div></div>
+      <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="16-lead-conversion.html" style="text-decoration: none;">
+          <button class="btn btn--primary btn--sm" style="background: var(--success); width: 100%;">${Icons.arrowRight} Convertir a oportunidad</button>
+        </a>
+        <button class="btn btn--secondary btn--block">${Icons.arrowRight} Trasladar a distribuidor</button>
+        <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Descalificar lead</button>
+      </div>
+    </div>
+  </div>`;
+
+  const headerHTML = `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;">
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+      <a href="03-leads-kanban.html" style="color: var(--primary); cursor: pointer;">Leads</a>
+      <span>/</span>
+      <span>${lead.id}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; gap: 16px;">
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+          <span class="badge badge--calificacion"><span class="dot"></span> ${lead.estado}</span>
+          <span class="badge badge--info" style="background:${origenColor}20; color:${origenColor};">${lead.origen}</span>
+          <span class="badge badge--accent">${Icons.fire.replace('class="icon"','class="icon icon--xs"')} Score ${lead.score}</span>
+        </div>
+        <div style="font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${lead.nombre}</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">${lead.empresa} · ${lead.ciudad} · ${crm.getDaysAgo(lead.fecha_creacion)}</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-shrink: 0;">
+        <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
+        <button class="btn btn--secondary btn--sm">${Icons.xCircle} Descalificar</button>
+        <a href="16-lead-conversion.html" style="text-decoration: none;">
+          <button class="btn btn--primary btn--sm" style="background: var(--success);">${Icons.arrowRight} Convertir</button>
+        </a>
+      </div>
+    </div>
+  </div>`;
+
+  const html = `<div class="content">
+    ${headerHTML}
+    <div style="display: grid; gap: 16px; grid-template-columns: 1fr 320px;">
+      <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+        ${interesesHTML}
+        ${actividadesHTML}
+        ${historialHTML}
+      </div>
+      ${sidePanel}
+    </div>
+  </div>`;
+
+  window.actualizarEstadoLead = function(id, nuevoEstado) {
+    crm.updateLead(id, { estado: nuevoEstado });
+    crm.recalculateMetricas();
+    const msg = document.getElementById('estado-msg');
+    if (msg) { msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 2000); }
+  };
+
+  document.getElementById('desktop-shell').innerHTML =
+    renderSidebar('leads', 'ejecutivo') +
+    '<div class="main-area">' +
+      renderTopbar({ breadcrumb: ['Leads', lead.id] }) +
+      html +
+    '</div>';
+};
 </script>
 </body>
 </html>

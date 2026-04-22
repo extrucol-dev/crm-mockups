@@ -239,7 +239,7 @@ function monitoreoContent(bp) {
                   <td style="text-align: center; color: ${e.estancados > 2 ? 'var(--error)' : e.estancados > 0 ? 'var(--accent)' : 'var(--text-muted)'}; font-weight: 700;">${e.estancados}</td>
                   <td style="text-align: center; color: ${e.sinActividad > 2 ? 'var(--error)' : e.sinActividad > 0 ? 'var(--accent)' : 'var(--text-muted)'}; font-weight: 700;">${e.sinActividad}</td>
                   <td><span class="badge badge--${badgeByEstado[e.estado]}"><span class="dot"></span> ${labelByEstado[e.estado]}</span></td>
-                  <td><button class="table__action">${Icons.view}</button></td>
+                  <td><a href="09-perfil-ejecutivo.html" style="text-decoration:none;"><button class="table__action">${Icons.view}</button></a></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -366,7 +366,7 @@ function mapaContent(bp) {
                   ${v.time}
                 </div>
               </div>
-              <button class="btn btn--ghost btn--sm">${Icons.view}</button>
+<a href="09-alertas.html" style="text-decoration:none;"><button class="btn btn--ghost btn--sm">${Icons.view}</button></a>
             </div>
           `).join('')}
         </div>
@@ -460,7 +460,7 @@ function notifContent(bp) {
                 Para: <strong style="color: var(--text-secondary);">${n.to}</strong> · ${n.time}
               </div>
             </div>
-            <button class="btn btn--ghost btn--sm">${Icons.view}</button>
+<a href="09-alertas.html" style="text-decoration:none;"><button class="btn btn--ghost btn--sm">${Icons.view}</button></a>
           </div>
         `).join('')}
       </div>
@@ -470,8 +470,6 @@ function notifContent(bp) {
 
 
 document.getElementById('d-not').innerHTML = `${renderSidebar('notificaciones','coordinador')}<div class="main-area">${renderTopbar({title:'Notificaciones'})}${notifContent('desktop')}</div>`;
-document.getElementById('t-not').innerHTML = `${renderSidebar('notificaciones','coordinador')}<div class="main-area">${renderTopbar({title:'Notificaciones'})}${notifContent('tablet')}</div>`;
-document.getElementById('m-not').innerHTML = `<div class="main-area">${renderTopbar({title:'Notificaciones'})}${notifContent('mobile')}</div>`;
 </script>
 </body>
 </html>

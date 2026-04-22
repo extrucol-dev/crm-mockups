@@ -89,6 +89,20 @@ function renderSidebar(activeItem = 'dashboard', role = 'ejecutivo') {
         { id: 'actividades', label: 'Actividades', icon: 'clipboard', route: '07-actividades.html' },
         { id: 'proyectos', label: 'Proyectos', icon: 'folder', route: '08-proyectos.html' },
       ]
+},
+    coordinador: {
+      user: { name: 'Diana Ruiz', role: 'Coordinador', initial: 'DR' },
+      items: [
+        { id: 'dashboard', label: 'Panel seguimiento', icon: 'home', route: '01-dashboard.html' },
+        { id: 'alertas', label: 'Alertas activas', icon: 'bell', route: '09-alertas.html' },
+        { id: 'variables', label: 'Variables sistema', icon: 'adjustments', route: '02-variables-sistema.html' },
+        { id: 'monitoreo', label: 'Monitoreo ejecutivos', icon: 'view', route: '03-monitoreo-mapa-notif.html' },
+        { id: 'estancados', label: 'Leads/Opp estancados', icon: 'clock', route: '05-estancados.html' },
+        { id: 'mapa', label: 'Mapa actividades', icon: 'gps', route: '06-mapa-actividades.html' },
+        { id: 'notificaciones', label: 'Log notificaciones', icon: 'inbox', route: '07-log-otificaciones.html' },
+        { id: 'cumplimiento', label: 'Cumplimiento', icon: 'clipboardCheck', route: '04-cumplimiento.html' },
+        { id: 'perfil-ejecutivo', label: 'Perfil Ejecutivos', icon: 'users', route: '09-perfil-ejecutivo.html' },
+      ]
     },
     director: {
       user: { name: 'Carlos Muñoz', role: 'Director', initial: 'CM' },
@@ -96,22 +110,10 @@ function renderSidebar(activeItem = 'dashboard', role = 'ejecutivo') {
         { id: 'dashboard', label: 'Dashboard', icon: 'chartBar', route: '01-dashboard.html' },
         { id: 'pipeline', label: 'Pipeline global', icon: 'funnel', route: '02-pipeline-global.html' },
         { id: 'equipo', label: 'Equipo comercial', icon: 'users', route: '05-equipo-comercial.html' },
+        { id: 'metricas', label: 'Métricas', icon: 'chartPie', route: '08-metricas-globales.html' },
         { id: 'reportes', label: 'Reportes', icon: 'chartPie', route: '06-reportes.html' },
         { id: 'sectores', label: 'Análisis sectores', icon: 'building', route: '03-analisis-sectores.html' },
         { id: 'forecasting', label: 'Forecasting', icon: 'trendingUp', route: '04-forecasting.html' },
-      ]
-    },
-    coordinador: {
-      user: { name: 'Diana Ruiz', role: 'Coordinador', initial: 'DR' },
-      items: [
-        { id: 'dashboard', label: 'Panel seguimiento', icon: 'home', route: '01-dashboard.html' },
-        { id: 'alertas', label: 'Alertas activas', icon: 'bell', route: '01-dashboard.html' },
-        { id: 'variables', label: 'Variables sistema', icon: 'adjustments', route: '02-variables-sistema.html' },
-        { id: 'monitoreo', label: 'Monitoreo ejecutivos', icon: 'view', route: '03-monitoreo-mapa-notif.html' },
-        { id: 'estancados', label: 'Leads/Opp estancados', icon: 'clock', route: '05-estancados.html' },
-        { id: 'mapa', label: 'Mapa actividades', icon: 'gps', route: '06-mapa-actividades.html' },
-        { id: 'notificaciones', label: 'Log notificaciones', icon: 'inbox', route: '07-log-otificaciones.html' },
-        { id: 'cumplimiento', label: 'Cumplimiento', icon: 'clipboardCheck', route: '04-cumplimiento.html' },
       ]
     },
     admin: {
@@ -212,10 +214,44 @@ function renderMobileBottomNav(active = 'dashboard', role = 'ejecutivo') {
   return `<nav class="mobile-bottom-nav">${items}</nav>`;
 }
 
+function renderCalendar({ year = 2026, month = 3, activities = {}, tipoColors = {}, dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'] } = {}) {
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const defaultColors = { visita: '#F39610', llamada: '#22C55E', reunion: '#24388C', email: '#A855F7' };
+  const colors = { ...defaultColors, ...tipoColors };
+
+  const firstDay = new Date(year, month - 1, 1).getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  let cells = '';
+  for (let i = 0; i < firstDay; i++) {
+    cells += `<div style="padding: 8px; min-height: 80px;"></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const acts = activities[d] || [];
+    const actDots = acts.map(a => `<div style="width: 6px; height: 6px; border-radius: 50%; background: ${colors[a.tipo] || '#24388C'};"></div>`).join('');
+    cells += `
+      <div style="padding: 8px; min-height: 80px; border: 1px solid var(--border); text-align: center;">
+        <span style="font-weight: 400; color: var(--text-primary);">${d}</span>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 6px;">
+          ${actDots}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
+      ${dayNames.map(d => `<div style="padding: 10px; text-align: center; font-size: var(--fs-xxs); font-weight: 700; color: var(--text-muted); text-transform: uppercase; background: var(--page-bg); border-bottom: 1px solid var(--border);">${d}</div>`).join('')}
+      ${cells}
+    </div>
+  `;
+}
+
 /* On DOM ready - auto-inject shared components */
 if (typeof window !== 'undefined') {
   window.Icons = Icons;
   window.renderSidebar = renderSidebar;
   window.renderTopbar = renderTopbar;
   window.renderMobileBottomNav = renderMobileBottomNav;
+  window.renderCalendar = renderCalendar;
 }

@@ -6,374 +6,143 @@
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 24px; }
-  .canvas-section-title { font: 700 15px 'Roboto'; color: #24388C; margin: 40px 0 20px; padding: 8px 14px; background: #fff; border: 1px solid #E5E5E5; border-radius: 6px; display: inline-block; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; margin-bottom: 30px; }
-  .bp-col { display: flex; flex-direction: column; }
+.activity-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  transition: background 180ms; cursor: pointer;
+}
+.activity-row:hover { background: var(--page-bg); }
+.activity-row__icon {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--primary-bg); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.activity-row__icon--llamada { background: #E8F5EE; color: var(--success); }
+.activity-row__icon--email { background: #F3E8FF; color: #7C3AED; }
+.activity-row__icon--visita { background: var(--accent-bg); color: #C7770D; }
+.activity-row__icon--reunion { background: var(--primary-bg); color: var(--primary); }
 
-  /* Activity Row */
-  .activity-row {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
-    transition: background 180ms;
-    cursor: pointer;
-  }
-  .activity-row:hover { background: var(--page-bg); }
-  .activity-row__icon {
-    width: 40px; height: 40px; border-radius: 8px;
-    background: var(--primary-bg); color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .activity-row__icon--llamada { background: #E8F5EE; color: var(--success); }
-  .activity-row__icon--email { background: #F3E8FF; color: #7C3AED; }
-  .activity-row__icon--visita { background: var(--accent-bg); color: #C7770D; }
-  .activity-row__icon--reunion { background: var(--primary-bg); color: var(--primary); }
-
-  /* Map with pin style */
-  .big-map {
-    height: 280px;
-    border-radius: 8px;
-    background-color: #E8EEF5;
-    background-image:
-      linear-gradient(rgba(36, 56, 140, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(36, 56, 140, 0.06) 1px, transparent 1px),
-      radial-gradient(circle at 30% 40%, rgba(243, 150, 16, 0.1), transparent 50%);
-    background-size: 24px 24px, 24px 24px, auto;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .map-main-pin {
-    position: absolute;
-    top: 45%; left: 50%;
-    transform: translate(-50%, -100%);
-    width: 36px; height: 36px;
-    background: var(--primary);
-    border: 4px solid #fff;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(36, 56, 140, 0.4);
-    z-index: 2;
-  }
-  .map-main-pin::after {
-    content: '';
-    position: absolute;
-    left: 50%; bottom: -10px;
-    transform: translateX(-50%);
-    width: 2px; height: 10px;
-    background: var(--primary);
-  }
-  .map-main-pin::before {
-    content: '';
-    position: absolute;
-    inset: 6px;
-    background: #fff;
-    border-radius: 50%;
-  }
-
-  .pulse-ring {
-    position: absolute;
-    top: 45%; left: 50%;
-    transform: translate(-50%, -100%);
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    border: 2px solid var(--primary);
-    opacity: 0.3;
-    animation: pulse 2s ease-out infinite;
-  }
-  @keyframes pulse {
-    0% { transform: translate(-50%, -100%) scale(0.5); opacity: 0.6; }
-    100% { transform: translate(-50%, -100%) scale(2); opacity: 0; }
-  }
-
-  .gps-indicator {
-    position: absolute;
-    top: 12px; left: 12px;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(6px);
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--success);
-    display: flex; align-items: center; gap: 6px;
-    box-shadow: var(--shadow-sm);
-  }
-  .gps-indicator::before {
-    content: '';
-    width: 8px; height: 8px;
-    background: var(--green-bright);
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
-    animation: blink 1.5s ease infinite;
-  }
-  @keyframes blink {
-    50% { opacity: 0.4; }
-  }
-
-  .activity-type-selector {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  .activity-type-card {
-    padding: 16px 8px; border: 1px solid var(--border);
-    border-radius: 8px; text-align: center; cursor: pointer;
-    transition: all 180ms; display: flex; flex-direction: column;
-    align-items: center; gap: 6px;
-    background: var(--surface);
-  }
-  .activity-type-card:hover { border-color: var(--primary); }
-  .activity-type-card.is-active {
-    border-color: var(--primary); background: var(--primary-bg);
-  }
-  .activity-type-card__icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--page-bg);
-  }
-  .activity-type-card.is-active .activity-type-card__icon {
-    background: var(--primary); color: #fff;
-  }
-  .activity-type-card__label {
-    font-size: 12px; font-weight: 600; color: var(--text-secondary);
-  }
-  .activity-type-card.is-active .activity-type-card__label {
-    color: var(--primary);
-  }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text-primary); color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 8px;
+}
+.toast.is-success { background: var(--success); }
+.toast.is-error { background: var(--error); }
 </style>
 </head>
 <body>
-<div >
-  <div>
-
-
-    <!-- VISTA 1: LISTA -->
-
-    <div >
-      <div >
-        <div >
-          <div class="app-shell" id="list-desktop">
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
+<div id="toast" class="toast"></div>
+<div class="app-shell" id="desktop-shell"></div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-const actividades = [
-  { tipo: 'visita', icon: 'mapPin', iconClass: 'visita', titulo: 'Visita técnica - EMPAS S.A.', sub: 'Inspección de planta para dimensionamiento red', date: '10:30 AM', day: 'Hoy', badge: 'ganada', badgeText: 'Completada'},
-  { tipo: 'llamada', icon: 'phone', iconClass: 'llamada', titulo: 'Llamada seguimiento - Tecnoagua', sub: 'Seguimiento a propuesta técnica de tubería PE100', date: '9:00 AM', day: 'Hoy', badge: 'ganada', badgeText: 'Completada'},
-  { tipo: 'reunion', icon: 'view', iconClass: 'reunion', titulo: 'Reunión virtual - Aguas del Valle', sub: 'Presentación inicial del portafolio', date: '3:00 PM', day: 'Hoy', badge: 'prospecto', badgeText: 'Agendada'},
-  { tipo: 'email', icon: 'envelope', iconClass: 'email', titulo: 'Email - Constructora Andina', sub: 'Envío de cotización revisada según última reunión', date: '8:15 AM', day: 'Ayer', badge: 'ganada', badgeText: 'Completada'},
-  { tipo: 'visita', icon: 'mapPin', iconClass: 'visita', titulo: 'Visita - Ingenio del Cauca', sub: 'Recorrido técnico por cultivo para riego', date: '2:00 PM', day: 'Mañana', badge: 'prospecto', badgeText: 'Agendada'},
-  { tipo: 'llamada', icon: 'phone', iconClass: 'llamada', titulo: 'Llamada prospección - EAAB', sub: 'Primer contacto para licitación próxima', date: '11:00 AM', day: 'Viernes', badge: 'prospecto', badgeText: 'Agendada'},
-];
+const currentUser = 'PAOLA';
+let currentView = 'list';
 
-function activityRow(a) {
-  return `
-    <div class="activity-row">
-      <div class="activity-row__icon activity-row__icon--${a.iconClass}">${Icons[a.icon]}</div>
-      <div style="flex:1; min-width: 0;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-          <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">${a.titulo}</span>
-        </div>
-        <div style="font-size: 12.5px; color: var(--text-muted);">${a.sub}</div>
-      </div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
-        <span class="badge badge--${a.badge}"><span class="dot"></span> ${a.badgeText}</span>
-        <span style="font-size: 12px; color: var(--text-muted);">${a.day} · ${a.date}</span>
-      </div>
-    </div>
-  `;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast is-' + type;
+  t.style.display = 'flex';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
 
-function listContent(bp) {
-  const isMobile = bp === 'mobile';
-  return `
-    <div class="content">
+const tipoIconMap = { LLAMADA: 'phone', EMAIL: 'envelope', VISITA: 'mapPin', REUNION: 'view' };
+const tipoColorMap = { LLAMADA: 'llamada', EMAIL: 'email', VISITA: 'visita', REUNION: 'reunion' };
+const tipoLabels = { LLAMADA: 'Llamada', EMAIL: 'Email', VISITA: 'Visita', REUNION: 'Reunion' };
+
+function activityRowFromData(a, crm) {
+  const iconKey = tipoIconMap[a.tipo] || 'circle';
+  const colorClass = tipoColorMap[a.tipo] || '';
+  const lead = (crm.data && crm.data.leads) ? crm.data.leads.find(l => l.id === a.lead_id) : null;
+  const leadEmpresa = lead ? lead.empresa : (a.lead_id || '');
+  return `<div class="activity-row" onclick="window.location.href='10-lead-detalle.html?id=${a.lead_id}'">
+    <div class="activity-row__icon activity-row__icon--${colorClass}">${Icons[iconKey]}</div>
+    <div style="flex:1; min-width: 0;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+        <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">${(a.descripcion || '').substring(0, 65)}${a.descripcion && a.descripcion.length > 65 ? '...' : ''}</span>
+        ${a.gps_lat ? `<span class="badge badge--ganada" style="font-size:9px;"><span class="dot"></span> GPS</span>` : ''}
+      </div>
+      <div style="font-size: 12.5px; color: var(--text-muted);">${a.lead_id || ''} · ${leadEmpresa}</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
+      <span class="badge badge--${a.completada ? 'ganada' : 'prospecto'}"><span class="dot"></span> ${a.completada ? 'Completada' : 'Pendiente'}</span>
+      <span style="font-size: 12px; color: var(--text-muted);">${crm.formatDate(a.fecha)}</span>
+    </div>
+  </div>`;
+}
+
+window.onCRMDataLoaded = function(crm) {
+  window._crmInstance = crm;
+
+  function renderList() {
+    const misAct = crm.getActividades({ asesor: currentUser });
+    const hoy = new Date().toISOString().split('T')[0];
+    const ayer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const hoyActs = misAct.filter(a => a.fecha === hoy);
+    const ayerActs = misAct.filter(a => a.fecha === ayer);
+    const otrasActs = misAct.filter(a => a.fecha !== hoy && a.fecha !== ayer);
+    const todayStr = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long' });
+
+    return `<div class="content">
       <div class="page-head">
         <div class="page-head__title-group">
           <div class="page-head__title">Mis actividades</div>
-          <div class="page-head__subtitle">${actividades.length} actividades · 3 completadas hoy</div>
+          <div class="page-head__subtitle">${misAct.length} actividades · ${hoyActs.length} completadas hoy</div>
         </div>
-        ${!isMobile ? `
-          <div class="page-head__actions">
-            <div class="tabs" style="border-bottom: none; margin-bottom: 0;">
-              <a class="tab is-active">Lista</a>
-              <a class="tab">Calendario</a>
-              <a class="tab">Mapa</a>
-            </div>
-            <a href="13-actividad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-             <button class="btn btn--primary btn--sm">${Icons.plus} Registrar</button>
-            </a>
-            
-          </div>
-        ` : ''}
+        <div class="page-head__actions">
+          <a href="13-actividad-detalle.html" style="text-decoration: none;">
+            <button class="btn btn--primary btn--sm">${Icons.plus} Registrar</button>
+          </a>
+        </div>
       </div>
 
       <div class="filter-bar">
         <div class="input-wrapper" style="flex:1; max-width: 320px;">${Icons.search}<input class="input input--with-icon" placeholder="Buscar actividad..."></div>
-        ${!isMobile ? `
-          <select class="select" style="max-width: 180px;">
-            <option>Todos los tipos</option>
-            <option>Llamadas</option>
-            <option>Visitas</option>
-            <option>Reuniones</option>
-            <option>Emails</option>
-          </select>
-          <select class="select" style="max-width: 180px;">
-            <option>Esta semana</option>
-            <option>Hoy</option>
-            <option>Este mes</option>
-            <option>Último trimestre</option>
-          </select>
-        ` : ''}
+        <select class="select" style="max-width: 160px;">
+          <option>Todos los tipos</option>
+          <option>LLAMADA</option><option>VISITA</option><option>EMAIL</option><option>REUNION</option>
+        </select>
+        <select class="select" style="max-width: 160px;">
+          <option>Esta semana</option><option>Hoy</option><option>Este mes</option>
+        </select>
       </div>
 
       <div class="card" style="padding: 0;">
+        ${hoyActs.length > 0 ? `
         <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--page-bg); display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Hoy · 19 Abr 2026</span>
-          <span style="font-size: 12px; color: var(--text-muted);">3 actividades</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Hoy · ${todayStr}</span>
+          <span style="font-size: 12px; color: var(--text-muted);">${hoyActs.length} actividades</span>
         </div>
-        ${actividades.slice(0, 3).map(activityRow).join('')}
-
+        ${hoyActs.map(a => activityRowFromData(a, crm)).join('')}` : ''}
+        ${ayerActs.length > 0 ? `
         <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--page-bg); display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Ayer · 18 Abr 2026</span>
-          <span style="font-size: 12px; color: var(--text-muted);">1 actividad</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Ayer</span>
+          <span style="font-size: 12px; color: var(--text-muted);">${ayerActs.length} actividad${ayerActs.length !== 1 ? 'es' : ''}</span>
         </div>
-        ${actividades.slice(3, 4).map(activityRow).join('')}
-
+        ${ayerActs.map(a => activityRowFromData(a, crm)).join('')}` : ''}
+        ${otrasActs.length > 0 ? `
         <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--page-bg); display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Próximas</span>
-          <span style="font-size: 12px; color: var(--text-muted);">2 agendadas</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Anteriores</span>
+          <span style="font-size: 12px; color: var(--text-muted);">${otrasActs.length} actividades</span>
         </div>
-        ${actividades.slice(4).map(activityRow).join('')}
+        ${otrasActs.map(a => activityRowFromData(a, crm)).join('')}` : ''}
+        ${misAct.length === 0 ? '<div style="padding:24px;text-align:center;color:var(--text-muted);">Sin actividades registradas</div>' : ''}
       </div>
-    </div>
-  `;
-}
+    </div>`;
+  }
 
-function gpsContent(bp) {
-  const isMobile = bp === 'mobile';
-  return `
-    <div class="content">
-      ${!isMobile ? `
-        <div class="page-head">
-          <div class="page-head__title-group">
-            <div class="page-head__title">Registrar actividad</div>
-            <div class="page-head__subtitle">Captura los datos y ubicación de tu visita</div>
-          </div>
-        </div>
-      ` : ''}
-
-      <div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;">
-        <!-- Tipo de actividad -->
-        <div class="card">
-          <div class="card__body">
-            <label class="form-field__label" style="margin-bottom: 10px; display: block;">Tipo de actividad</label>
-            <div class="activity-type-selector" style="${isMobile ? 'grid-template-columns: repeat(2, 1fr);' : ''}">
-              <div class="activity-type-card is-active">
-                <div class="activity-type-card__icon">${Icons.mapPin}</div>
-                <div class="activity-type-card__label">Visita</div>
-              </div>
-              <div class="activity-type-card">
-                <div class="activity-type-card__icon">${Icons.phone}</div>
-                <div class="activity-type-card__label">Llamada</div>
-              </div>
-              <div class="activity-type-card">
-                <div class="activity-type-card__icon">${Icons.view}</div>
-                <div class="activity-type-card__label">Reunión</div>
-              </div>
-              <div class="activity-type-card">
-                <div class="activity-type-card__icon">${Icons.envelope}</div>
-                <div class="activity-type-card__label">Email</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mapa GPS activo -->
-        <div class="card">
-          <div class="card__header">
-            <div>
-              <div class="card__title">Ubicación actual</div>
-              <div class="card__subtitle">GPS activo · Precisión ±8m</div>
-            </div>
-            <span class="badge badge--ganada"><span class="dot"></span> Conectado</span>
-          </div>
-          <div style="padding: 16px;">
-            <div class="big-map">
-              <div class="gps-indicator">GPS activo</div>
-              <div class="pulse-ring"></div>
-              <div class="map-main-pin"></div>
-              <div style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(255,255,255,0.95); backdrop-filter: blur(6px); padding: 10px 14px; border-radius: 8px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px;">
-                ${Icons.mapPin}
-                <div style="flex:1; min-width: 0;">
-                  <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary);">Calle 29 #28-32, Piedecuesta</div>
-                  <div style="font-size: 11px; color: var(--text-muted);">Lat: 6.9831°, Lng: -73.0483°</div>
-                </div>
-                <button class="btn btn--ghost btn--sm">${Icons.gps}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Datos de la actividad -->
-        <div class="card">
-          <div class="card__header">
-            <div class="card__title">Información de la visita</div>
-          </div>
-          <div class="card__body" style="display: flex; flex-direction: column; gap: 14px;">
-            <div class="form-field">
-              <label class="form-field__label">Asunto <span class="req">*</span></label>
-              <input class="input" value="Inspección técnica para dimensionamiento" />
-            </div>
-            <div style="display: grid; grid-template-columns: ${isMobile ? '1fr' : '1fr 1fr'}; gap: 14px;">
-              <div class="form-field">
-                <label class="form-field__label">Relacionado con <span class="req">*</span></label>
-                <select class="select">
-                  <option>Oportunidad</option>
-                  <option>Lead</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label class="form-field__label">Buscar oportunidad</label>
-                <select class="select">
-                  <option>OPP-2025-0042 - Proyecto acueducto rural</option>
-                  <option>OPP-2025-0038 - Suministro anual</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Descripción</label>
-              <textarea class="textarea" rows="3" placeholder="Describe brevemente los detalles...">Reunión con ingeniero residente y director técnico. Se revisaron especificaciones de la red, se acordó enviar propuesta revisada.</textarea>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label">Resultado</label>
-              <textarea class="textarea" rows="2" placeholder="Qué se logró o acordó...">Acuerdo de entregar propuesta comercial actualizada antes del 25 de marzo.</textarea>
-            </div>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; ${isMobile ? 'flex-direction: column;' : ''}">
-          <button class="btn btn--secondary btn--block">Cancelar</button>
-          <button class="btn btn--primary btn--block">${Icons.check} Registrar visita</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// Render
-document.getElementById('list-desktop').innerHTML = `${renderSidebar('actividades', 'ejecutivo')}<div class="main-area">${renderTopbar({title:'Mis actividades'})}${listContent('desktop')}</div>`;
-document.getElementById('list-tablet').innerHTML = `${renderSidebar('actividades', 'ejecutivo')}<div class="main-area">${renderTopbar({title:'Actividades'})}${listContent('tablet')}</div>`;
-document.getElementById('list-mobile').innerHTML = `<div class="main-area">${renderTopbar({title:'Actividades', actions:`<button class="topbar__icon-btn">${Icons.plus}</button>`})}${listContent('mobile')}${renderMobileBottomNav('actividades')}</div>`;
-
+  document.getElementById('desktop-shell').innerHTML =
+    renderSidebar('actividades', 'ejecutivo') +
+    '<div class="main-area">' +
+      renderTopbar({ title: 'Mis actividades' }) +
+      renderList() +
+    '</div>';
+};
 </script>
 </body>
 </html>

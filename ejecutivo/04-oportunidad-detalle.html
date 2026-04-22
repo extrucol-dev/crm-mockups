@@ -6,142 +6,157 @@
 <link rel="stylesheet" href="../shared/tokens.css">
 <link rel="stylesheet" href="../shared/components.css">
 <style>
-  .canvas-title { font: 800 22px 'Roboto'; color: #1A1A1A; margin-bottom: 6px; }
-  .canvas-subtitle { font: 400 14px 'Roboto'; color: #6B6B6B; margin-bottom: 40px; }
-  .breakpoints-row { display: flex; gap: 60px; align-items: flex-start; }
-  .bp-col { display: flex; flex-direction: column; }
+.detail-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.detail-header__row {
+  display: flex; align-items: flex-start; gap: 16px; justify-content: space-between;
+}
+.detail-title {
+  font-size: 22px; font-weight: 800; color: var(--text-primary);
+  letter-spacing: -0.02em; line-height: 1.2;
+}
+.detail-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.detail-meta {
+  display: flex; gap: 24px; margin-top: 16px;
+  padding-top: 16px; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.detail-meta__item { display: flex; flex-direction: column; gap: 2px; }
+.detail-meta__label {
+  font-size: 10.5px; font-weight: 600; color: var(--text-disabled);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.detail-meta__value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.detail-meta__value--accent { color: var(--accent); font-size: 17px; font-weight: 700; }
 
-  .detail-header {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 16px;
-  }
-  .detail-header__row {
-    display: flex; align-items: flex-start; gap: 16px; justify-content: space-between;
-  }
-  .detail-title {
-    font-size: 22px; font-weight: 800; color: var(--text-primary);
-    letter-spacing: -0.02em; line-height: 1.2;
-  }
-  .detail-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-  .detail-meta {
-    display: flex; gap: 24px; margin-top: 16px;
-    padding-top: 16px; border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .detail-meta__item {
-    display: flex; flex-direction: column; gap: 2px;
-  }
-  .detail-meta__label {
-    font-size: 10.5px; font-weight: 600; color: var(--text-disabled);
-    text-transform: uppercase; letter-spacing: 0.06em;
-  }
-  .detail-meta__value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .detail-meta__value--accent { color: var(--accent); font-size: 17px; font-weight: 700; }
-
-  .producto-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-  }
-  .producto-row:last-child { border-bottom: none; }
-  .producto-icon {
-    width: 40px; height: 40px; border-radius: 8px;
-    background: var(--primary-bg); color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-  }
+.producto-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.producto-row:last-child { border-bottom: none; }
+.producto-icon {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--primary-bg); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+}
 </style>
 </head>
 <body>
-<div>
-  <div>
+<div class="app-shell" id="desktop-shell"></div>
 
-    <div>
-      <div>
-        <div><div class="app-shell" id="desktop-shell"></div></div>
+<div id="product-modal" style="position:fixed;inset:0;background:rgba(26,26,26,0.5);display:none;align-items:center;justify-content:center;padding:60px 24px;z-index:200;">
+  <div style="background:var(--surface);border-radius:12px;max-width:480px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,0.15);">
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-weight:700;font-size:16px;">Agregar producto</div>
+      <button onclick="closeProductModal()" style="background:none;border:none;cursor:pointer;padding:4px;">${Icons.close}</button>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div class="form-field" style="margin:0;">
+        <label class="form-field__label">Producto</label>
+        <select class="select" id="modal-producto-select" style="width:100%;"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-field" style="margin:0;">
+          <label class="form-field__label">Cantidad</label>
+          <input class="input" type="number" id="modal-cantidad" value="1" min="1" />
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label class="form-field__label">Precio unitario (COP)</label>
+          <input class="input" type="number" id="modal-precio" placeholder="0" />
+        </div>
+      </div>
+      <div id="modal-product-preview" style="padding:12px;background:var(--page-bg);border-radius:8px;display:none;">
+        <div style="font-weight:600;font-size:13px;" id="preview-nombre"></div>
+        <div style="font-size:12px;color:var(--text-muted);">Subtotal: <strong id="preview-subtotal"></strong></div>
       </div>
     </div>
-
+    <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--page-bg);">
+      <button onclick="closeProductModal()" class="btn btn--secondary">Cancelar</button>
+      <button onclick="addProductToOpp()" class="btn btn--primary">${Icons.check} Agregar</button>
+    </div>
   </div>
 </div>
 
 <script src="../shared/components.js"></script>
+<script src="../js/crm-data-loader.js"></script>
 <script>
-function content(bp) {
-  const isCompact = bp === 'tablet' || bp === 'mobile';
+window._oppProductos = [{"id":"P001","nombre":"TUBERIA HDPE 200mm PN12","categoria":"TUBERIA","precio_base":146667},{"id":"P002","nombre":"TUBERIA HDPE 400mm PN8","categoria":"TUBERIA","precio_base":89000},{"id":"P003","nombre":"TUBERIA HDPE 500mm PN10","categoria":"TUBERIA","precio_base":634209},{"id":"P004","nombre":"TUBERIA HDPE 600mm PN6","categoria":"TUBERIA","precio_base":331530},{"id":"P005","nombre":"TUBERIA HDPE 800mm PN6","categoria":"TUBERIA","precio_base":222000},{"id":"P006","nombre":"TUBERIA HDPE 1000mm PN4","categoria":"TUBERIA","precio_base":234969},{"id":"P007","nombre":"ACCESORIOS PEAD","categoria":"ACCESORIOS","precio_base":2000000},{"id":"P008","nombre":"ACCESORIOS HIDRAULICOS","categoria":"ACCESORIOS","precio_base":54401299},{"id":"P009","nombre":"MEDIDOR DE CAUDAL","categoria":"MEDIDORES","precio_base":1500000}];
 
-  const productosHTML = `
-    <div class="producto-row">
-      <div class="producto-icon">${Icons.archive}</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--text-primary); font-size: 13.5px;">Tubería PE100 SDR 11 - 4"</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Uso: Conducción agua potable · Presión 16 bar</div>
-      </div>
-      <span class="badge badge--info">Principal</span>
-    </div>
-    <div class="producto-row">
-      <div class="producto-icon">${Icons.archive}</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--text-primary); font-size: 13.5px;">Accesorios electrofusión 4"</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Codos 90°, tees, reducciones · EF</div>
-      </div>
-    </div>
-    <div class="producto-row">
-      <div class="producto-icon">${Icons.archive}</div>
-      <div style="flex:1;">
-        <div style="font-weight:600; color: var(--text-primary); font-size: 13.5px;">Válvulas de compuerta 4"</div>
-        <div style="font-size: 12px; color: var(--text-muted);">AWWA C509 · Vástago no ascendente</div>
-      </div>
-    </div>
-  `;
+function openProductModal() {
+  const modal = document.getElementById('product-modal');
+  const select = document.getElementById('modal-producto-select');
+  const productos = window._oppProductos || [];
+  select.innerHTML = '<option value="">Seleccionar producto...</option>' +
+    productos.map(p => '<option value="' + p.id + '" data-precio="' + p.precio_base + '">' + p.nombre + ' - ' + CRMData.formatCurrency(p.precio_base) + '</option>').join('');
+  modal.style.display = 'flex';
+}
+function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
+document.getElementById('modal-producto-select').addEventListener('change', function() {
+  const opt = this.selectedOptions[0];
+  if (opt && opt.dataset.precio) {
+    document.getElementById('modal-precio').value = opt.dataset.precio;
+    document.getElementById('preview-nombre').textContent = opt.text;
+    document.getElementById('modal-product-preview').style.display = 'block';
+    updateModalSubtotal();
+  }
+});
+document.getElementById('modal-cantidad').addEventListener('input', updateModalSubtotal);
+document.getElementById('modal-precio').addEventListener('input', updateModalSubtotal);
+function updateModalSubtotal() {
+  const cant = parseInt(document.getElementById('modal-cantidad').value) || 0;
+  const precio = parseInt(document.getElementById('modal-precio').value) || 0;
+  document.getElementById('preview-subtotal').textContent = CRMData.formatCurrency(cant * precio);
+}
+function addProductToOpp() {
+  const select = document.getElementById('modal-producto-select');
+  const opt = select.selectedOptions[0];
+  if (!opt || !opt.value) { alert('Selecciona un producto'); return; }
+  const cant = parseInt(document.getElementById('modal-cantidad').value) || 0;
+  const precio = parseInt(document.getElementById('modal-precio').value) || 0;
+  const nombre = opt.text.split(' - ')[0];
+  if (window._pendingProduct) { window._pendingProduct({ nombre, cantidad: cant, precio_unitario: precio, subtotal: cant * precio }); }
+  closeProductModal();
+}
 
-  const actividadesHTML = `
-    <div class="timeline">
-      <div class="timeline__item">
-        <div class="timeline__dot timeline__dot--success"></div>
-        <div class="timeline__header">
-          <div class="timeline__title">Reunión técnica en planta</div>
-          <span class="timeline__date">Hoy, 10:30 AM</span>
-        </div>
-        <div class="timeline__desc">
-          Visita con el ingeniero residente para revisar especificaciones del acueducto rural.
-          Se acordó entregar propuesta revisada el 25 de marzo.
-        </div>
-        <div style="display: flex; gap: 6px; margin-top: 8px;">
-          <span class="badge badge--info">${Icons.mapPin.replace('class="icon"','class="icon icon--xs"')} Visita</span>
-          <span class="badge badge--ganada"><span class="dot"></span> Completada</span>
-        </div>
+window.onCRMDataLoaded = function(crm) {
+  const params = new URLSearchParams(window.location.search);
+  const oppId = params.get('id') || 'OPP-004';
+  const opp = crm.data.oportunidades.find(o => o.id === oppId) || crm.data.oportunidades[0];
+
+  const productosHTML = opp.productos && opp.productos.length > 0 ? opp.productos.map((p, i) => `
+    <div class="producto-row">
+      <div class="producto-icon">${Icons.archive}</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; color: var(--text-primary); font-size: 13.5px;">${p.nombre}</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Cantidad: ${p.cantidad} · ${crm.formatCurrency(p.precio_unitario)}/und</div>
       </div>
-      <div class="timeline__item">
-        <div class="timeline__dot timeline__dot--success"></div>
-        <div class="timeline__header">
-          <div class="timeline__title">Envío de cotización preliminar</div>
-          <span class="timeline__date">15 Mar, 3:20 PM</span>
-        </div>
-        <div class="timeline__desc">
-          Propuesta económica inicial por $ 485 M enviada al comité técnico.
-        </div>
-        <div style="display: flex; gap: 6px; margin-top: 8px;">
-          <span class="badge badge--neutral">${Icons.envelope.replace('class="icon"','class="icon icon--xs"')} Email</span>
-          <span class="badge badge--ganada"><span class="dot"></span> Completada</span>
-        </div>
-      </div>
-      <div class="timeline__item">
-        <div class="timeline__dot"></div>
-        <div class="timeline__header">
-          <div class="timeline__title">Llamada de seguimiento inicial</div>
-          <span class="timeline__date">10 Mar, 11:00 AM</span>
-        </div>
-        <div class="timeline__desc">
-          Primera llamada con el gerente de proyectos para conocer requerimientos técnicos.
-        </div>
-        <div style="display: flex; gap: 6px; margin-top: 8px;">
-          <span class="badge badge--neutral">${Icons.phone.replace('class="icon"','class="icon icon--xs"')} Llamada</span>
-        </div>
-      </div>
+      ${i === 0 ? '<span class="badge badge--info">Principal</span>' : ''}
     </div>
-  `;
+  `).join('') : '<div style="padding:24px;text-align:center;color:var(--text-muted);">Sin productos asociados</div>';
+
+  const actividadIconMap = { VISITA: 'mapPin', LLAMADA: 'phone', EMAIL: 'envelope', REUNION: 'view' };
+  const actividadColorMap = { VISITA: 'visita', LLAMADA: 'llamada', EMAIL: 'email', REUNION: 'reunion' };
+  const oppActividades = crm.data.actividades.filter(a => a.lead_id === opp.lead_id).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  const actCount = oppActividades.length;
+  const actividadesHTML = actCount > 0 ? `<div class="timeline">${oppActividades.slice(0, 3).map(a => `
+      <div class="timeline__item">
+        <div class="timeline__dot timeline__dot--${a.completada ? 'success' : ''}"></div>
+        <div class="timeline__header">
+          <div class="timeline__title">${a.descripcion.substring(0, 60)}${a.descripcion.length > 60 ? '...' : ''}</div>
+          <span class="timeline__date">${crm.getDaysAgo(a.fecha)}</span>
+        </div>
+        <div class="timeline__desc">${a.notas || 'Sin notas'}</div>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <span class="badge badge--${actividadColorMap[a.tipo] || 'neutral'}">${Icons[actividadIconMap[a.tipo] || 'view'].replace('class="icon"','class="icon icon--xs"')} ${a.tipo}</span>
+          ${a.completada ? '<span class="badge badge--ganada"><span class="dot"></span> Completada</span>' : '<span class="badge badge--prospecto"><span class="dot"></span> Pendiente</span>'}
+        </div>
+      </div>
+    `).join('')}</div>` : '<div style="padding:24px;text-align:center;color:var(--text-muted);">Sin actividades registradas</div>';
 
   const historialHTML = `
     <div class="timeline">
@@ -151,7 +166,7 @@ function content(bp) {
           <div class="timeline__title">Cambio a Propuesta</div>
           <span class="timeline__date">18 Mar</span>
         </div>
-        <div class="timeline__desc">Desde "Calificación" · por Juan Pérez</div>
+        <div class="timeline__desc">Desde "Calificación" · por ${opp.asesor}</div>
       </div>
       <div class="timeline__item">
         <div class="timeline__dot timeline__dot--muted"></div>
@@ -159,7 +174,7 @@ function content(bp) {
           <div class="timeline__title">Cambio a Calificación</div>
           <span class="timeline__date">12 Mar</span>
         </div>
-        <div class="timeline__desc">Desde "Prospección" · por Juan Pérez</div>
+        <div class="timeline__desc">Desde "Prospección" · por ${opp.asesor}</div>
       </div>
       <div class="timeline__item">
         <div class="timeline__dot timeline__dot--muted"></div>
@@ -167,90 +182,73 @@ function content(bp) {
           <div class="timeline__title">Oportunidad creada</div>
           <span class="timeline__date">05 Mar</span>
         </div>
-        <div class="timeline__desc">Convertida desde Lead "Proyecto acueducto rural EMPAS"</div>
+        <div class="timeline__desc">Convertida desde Lead "${opp.lead_id || 'N/A'}"</div>
       </div>
     </div>
   `;
 
-  // Cabecera oportunidad
   const headerHTML = `
     <div class="detail-header">
       <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-        <a style="color: var(--primary); cursor: pointer;">Oportunidades</a>
+        <a href="02-oportunidades-kanban.html" style="color: var(--primary); cursor: pointer;">Oportunidades</a>
         <span>/</span>
-        <span>OPP-2025-0042</span>
+        <span>${opp.id}</span>
       </div>
       <div class="detail-header__row">
         <div style="flex: 1;">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-            <span class="badge badge--propuesta"><span class="dot"></span> Propuesta</span>
-            <span class="badge badge--accent">Licitación</span>
+            <span class="badge badge--propuesta"><span class="dot"></span> ${opp.estado}</span>
+            <span class="badge badge--accent">${opp.origen}</span>
           </div>
-          <div class="detail-title">Proyecto acueducto rural - Piedecuesta</div>
-          <div class="detail-subtitle">EMPAS S.A. · Piedecuesta, Santander · Sector Agua Potable</div>
+          <div class="detail-title">${opp.nombre}</div>
+          <div class="detail-subtitle">${opp.empresa} · ${opp.asesor}</div>
         </div>
-        ${bp !== 'mobile' ? `
-          <div style="display: flex; gap: 8px; flex-shrink: 0;">
-            <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
-            <a href="13-actividad-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-              <button class="btn btn--secondary btn--sm">${Icons.plus} Actividad</button>
-            </a>
-            
-            <button class="btn btn--primary btn--sm">${Icons.arrowRight} Avanzar estado</button>
-          </div>
-        ` : `<button class="topbar__icon-btn">${Icons.dots}</button>`}
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+          <button class="btn btn--secondary btn--sm">${Icons.pencil} Editar</button>
+          <a href="13-actividad-detalle.html" style="text-decoration: none;">
+            <button class="btn btn--secondary btn--sm">${Icons.plus} Actividad</button>
+          </a>
+          <button class="btn btn--primary btn--sm">${Icons.arrowRight} Avanzar estado</button>
+        </div>
       </div>
       <div class="detail-meta">
         <div class="detail-meta__item">
           <span class="detail-meta__label">Valor estimado</span>
-          <span class="detail-meta__value detail-meta__value--accent">$ 485.000.000</span>
+          <span class="detail-meta__value detail-meta__value--accent">${crm.formatCurrency(opp.valor)}</span>
         </div>
         <div class="detail-meta__item">
           <span class="detail-meta__label">Cierre estimado</span>
-          <span class="detail-meta__value">25 Abr 2026</span>
+          <span class="detail-meta__value">${crm.formatDate(opp.fecha_cierre)}</span>
         </div>
         <div class="detail-meta__item">
           <span class="detail-meta__label">Ejecutivo</span>
-          <span class="detail-meta__value">Juan Pérez</span>
+          <span class="detail-meta__value">${opp.asesor}</span>
         </div>
         <div class="detail-meta__item">
           <span class="detail-meta__label">Probabilidad</span>
-          <span class="detail-meta__value">65%</span>
+          <span class="detail-meta__value">${opp.estado === 'Cerrada Ganada' ? '100%' : opp.estado === 'Cerrada Perdida' ? '0%' : '65%'}</span>
         </div>
         <div class="detail-meta__item">
-          <span class="detail-meta__label">Edad</span>
-          <span class="detail-meta__value">13 días</span>
+          <span class="detail-meta__label">Origen</span>
+          <span class="detail-meta__value">${opp.origen}</span>
         </div>
       </div>
     </div>
   `;
 
-  // Tabs
   const tabsHTML = `
     <div class="tabs">
       <a class="tab is-active">Resumen</a>
-      <a class="tab">Productos <span class="tab__count">3</span></a>
-      <a class="tab">Actividades <span class="tab__count">8</span></a>
+      <a class="tab">Productos <span class="tab__count">${opp.productos?.length || 0}</span></a>
+      <a class="tab">Actividades <span class="tab__count">${actCount}</span></a>
       <a class="tab">Historial</a>
-    </div>
-  `;
-
-  const tabsHTMLMobile = `
-    <div class="tabs" style="overflow-x: auto; scrollbar-width: none;">
-      <a class="tab is-active" style="flex-shrink: 0;">Resumen</a>
-      <a class="tab" style="flex-shrink: 0;">Productos</a>
-      <a class="tab" style="flex-shrink: 0;">Actividades</a>
-      <a class="tab" style="flex-shrink: 0;">Historial</a>
     </div>
   `;
 
   const productosCard = `
     <div class="card">
       <div class="card__header">
-        <div>
-          <div class="card__title">Productos asociados</div>
-          <div class="card__subtitle">3 productos en esta oportunidad</div>
-        </div>
+        <div><div class="card__title">Productos asociados</div><div class="card__subtitle">${opp.productos?.length || 0} productos en esta oportunidad</div></div>
         <button class="btn btn--ghost btn--sm">${Icons.plus} Agregar</button>
       </div>
       <div class="card__body" style="padding-top: 4px; padding-bottom: 4px;">
@@ -262,11 +260,8 @@ function content(bp) {
   const actividadesCard = `
     <div class="card">
       <div class="card__header">
-        <div>
-          <div class="card__title">Actividades recientes</div>
-          <div class="card__subtitle">Últimas 3 de 8</div>
-        </div>
-        <button class="btn btn--ghost btn--sm">Ver todas</button>
+        <div><div class="card__title">Actividades recientes</div><div class="card__subtitle">${actCount > 0 ? 'Últimas ' + Math.min(3, actCount) + ' de ' + actCount : 'Sin actividades'}</div></div>
+        <a href="07-actividades.html" style="text-decoration: none;"><button class="btn btn--ghost btn--sm">Ver todas</button></a>
       </div>
       <div class="card__body">${actividadesHTML}</div>
       <div class="card__footer" style="justify-content: center;">
@@ -275,123 +270,85 @@ function content(bp) {
     </div>
   `;
 
+  const relatedEmpresa = crm.data.empresas.find(e => e.nombre === opp.empresa) || { nombre: opp.empresa, nit: 'N/A', sector: 'N/A', ciudad: 'N/A', departamento: 'N/A', nuevo: true };
+  const empresaInitials = relatedEmpresa.nombre.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+  const oportunidadSector = opp.sector || relatedEmpresa.sector || 'N/A';
+
   const sidePanel = `
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <!-- Empresa -->
       <div class="card">
         <div class="card__header">
           <div class="card__title">Empresa</div>
-                    <a href="14-cliente-detalle.html" style="text-decoration: none; color: inherit; font: inherit; cursor: pointer;">
-                      <button class="btn btn--ghost btn--sm">${Icons.view}</button>
-          </a>
-
+          <button class="btn btn--ghost btn--sm">${Icons.view}</button>
         </div>
         <div class="card__body">
           <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-            <div class="avatar avatar--lg avatar--color-1">ES</div>
+            <div class="avatar avatar--lg avatar--color-1">${empresaInitials}</div>
             <div>
-              <div style="font-weight:700; color: var(--text-primary);">EMPAS S.A.</div>
-              <div style="font-size: 12px; color: var(--text-muted);">NIT 890.200.341-2</div>
+              <div style="font-weight:700; color: var(--text-primary);">${relatedEmpresa.nombre}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">${relatedEmpresa.nit}</div>
             </div>
           </div>
           <dl class="detail-info-list">
-            <dt>Sector</dt><dd>Agua Potable</dd>
-            <dt>Municipio</dt><dd>Piedecuesta</dd>
-            <dt>Modalidad</dt><dd>Interior</dd>
-            <dt>Cliente</dt><dd><span class="badge badge--info">Recurrente</span></dd>
+            <dt>Sector</dt><dd>${oportunidadSector}</dd>
+            <dt>Municipio</dt><dd>${relatedEmpresa.ciudad}</dd>
+            <dt>Departamento</dt><dd>${relatedEmpresa.departamento}</dd>
+            <dt>Cliente</dt><dd><span class="badge badge--${relatedEmpresa.nuevo ? 'info' : 'ganada'}">${relatedEmpresa.nuevo ? 'Nuevo' : 'Activo'}</span></dd>
           </dl>
         </div>
       </div>
 
-      <!-- Contacto principal -->
       <div class="card">
-        <div class="card__header">
-          <div class="card__title">Contacto</div>
-        </div>
+        <div class="card__header"><div class="card__title">Contacto</div></div>
         <div class="card__body">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-            <div class="avatar avatar--sm avatar--color-2">AR</div>
+            <div class="avatar avatar--sm avatar--color-2">${(opp.contacto || 'CN').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}</div>
             <div>
-              <div style="font-weight:600; color: var(--text-primary);">Andrés Rodríguez</div>
-              <div style="font-size: 12px; color: var(--text-muted);">Gerente de Proyectos</div>
+              <div style="font-weight:600; color: var(--text-primary);">${opp.contacto || 'Sin contacto'}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Contacto oportunidad</div>
             </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <a style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--primary); cursor: pointer;">
-              ${Icons.phone} +57 310 555 8842
-            </a>
-            <a style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--primary); cursor: pointer;">
-              ${Icons.envelope} a.rodriguez@empas.gov.co
-            </a>
           </div>
         </div>
       </div>
 
-      <!-- Acciones rápidas -->
       <div class="card">
-        <div class="card__header">
-          <div class="card__title">Cierre de oportunidad</div>
-        </div>
+        <div class="card__header"><div class="card__title">Cierre de oportunidad</div></div>
         <div class="card__body" style="display: flex; flex-direction: column; gap: 8px;">
-          <a href="11-cierre-oportunidad-ganada.html" style="text-decoration: none; color: inherit;">
+          <a href="11-cierre-oportunidad-ganada.html?id=${opp.id}" style="text-decoration: none;">
             <button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.check} Marcar como Ganada</button>
           </a>
-          <a href="17-cierre-oportunidad-perdida.html" style="text-decoration: none; color: inherit;">
+          <a href="17-cierre-oportunidad-perdida.html?id=${opp.id}" style="text-decoration: none;">
             <button class="btn btn--secondary btn--block" style="color: var(--error); border-color: var(--error-border);">${Icons.xCircle} Marcar como Perdida</button>
           </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header"><div class="card__title">Reasignar oportunidad</div></div>
+        <div class="card__body" style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="form-field" style="margin: 0;">
+            <label class="form-field__label">Ejecutivo asignado</label>
+            <select class="select">
+              <option>${opp.asesor} (actual)</option>
+              ${crm.data.usuarios.ejecutivos.filter(u => u.nombre !== opp.asesor).map(u => '<option>' + u.nombre + '</option>').join('')}
+            </select>
           </div>
+          <button class="btn btn--secondary btn--block">${Icons.users} Reasignar</button>
+        </div>
       </div>
     </div>
   `;
 
-  if (bp === 'mobile') {
-    return `
-      <div class="content" style="padding-top: 12px;">
-        ${headerHTML}
-        ${tabsHTMLMobile}
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          ${productosCard}
-          ${actividadesCard}
-          <div class="card">
-            <div class="card__header"><div class="card__title">Empresa</div></div>
-            <div class="card__body">
-              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                <div class="avatar avatar--color-1">ES</div>
-                <div>
-                  <div style="font-weight:700;">EMPAS S.A.</div>
-                  <div style="font-size: 12px; color: var(--text-muted);">NIT 890.200.341-2</div>
-                </div>
-              </div>
-              <dl class="detail-info-list">
-                <dt>Sector</dt><dd>Agua Potable</dd>
-                <dt>Municipio</dt><dd>Piedecuesta</dd>
-                <dt>Modalidad</dt><dd>Interior</dd>
-              </dl>
-            </div>
-          </div>
-          <button class="btn btn--primary btn--block" style="background: var(--success);">${Icons.check} Marcar como Ganada</button>
-        </div>
-      </div>
-    `;
-  }
-
-  const grid = isCompact
-    ? 'grid-template-columns: 1fr;'
-    : 'grid-template-columns: 1fr 320px;';
-
-  return `
+  const html = `
     <div class="content">
       ${headerHTML}
       ${tabsHTML}
-      <div style="display: grid; gap: 16px; ${grid}">
+      <div style="display: grid; gap: 16px; grid-template-columns: 1fr 320px;">
         <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
           ${productosCard}
           ${actividadesCard}
-
           <div class="card">
-            <div class="card__header">
-              <div class="card__title">Historial de estados</div>
-            </div>
+            <div class="card__header"><div class="card__title">Historial de estados</div></div>
             <div class="card__body">${historialHTML}</div>
           </div>
         </div>
@@ -399,29 +356,15 @@ function content(bp) {
       </div>
     </div>
   `;
-}
 
-document.getElementById('desktop-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ breadcrumb: ['Oportunidades', 'Detalle'] })}
-    ${content('desktop')}
-  </div>
-`;
-document.getElementById('tablet-shell').innerHTML = `
-  ${renderSidebar('oportunidades', 'ejecutivo')}
-  <div class="main-area">
-    ${renderTopbar({ breadcrumb: ['Oportunidades', 'Detalle'] })}
-    ${content('tablet')}
-  </div>
-`;
-document.getElementById('mobile-shell').innerHTML = `
-  <div class="main-area">
-    ${renderTopbar({ title: 'Oportunidad', actions: `<button class="topbar__icon-btn">${Icons.pencil}</button>` })}
-    ${content('mobile')}
-    ${renderMobileBottomNav('oportunidades')}
-  </div>
-`;
+  document.getElementById('desktop-shell').innerHTML = `
+    ${renderSidebar('oportunidades', 'ejecutivo')}
+    <div class="main-area">
+      ${renderTopbar({ breadcrumb: ['Oportunidades', opp.id] })}
+      ${html}
+    </div>
+  `;
+};
 </script>
 </body>
 </html>
