@@ -53,33 +53,10 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-    <div style="margin-bottom: 20px;">
-      <div class="canvas-title">🛠️ ADMIN — Formularios y Detalles</div>
-      <div class="canvas-subtitle">Complementa las vistas de listado con formularios CRUD y detalles extendidos.</div>
-    </div>
+<div>
+  <div>
+    <div class="app-shell" id="d-user"></div>
 
-    <div class="canvas-section-title">👤 Vista 1 — Formulario de Usuario (Crear/Editar)</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-user"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-user"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-user"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">📋 Vista 2 — Detalle de Catálogo (Estados de Oportunidad)</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-cat"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-cat"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-cat"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">🔍 Vista 3 — Detalle de Evento de Auditoría</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-aud"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-aud"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-aud"></div></div></div>
-    </div>
   </div>
 </div>
 
@@ -610,16 +587,6 @@ function auditDetailContent(bp) {
 }
 
 document.getElementById('d-user').innerHTML = `${renderSidebar('usuarios','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Usuarios','Nuevo']})}${userFormContent('desktop')}</div>`;
-document.getElementById('t-user').innerHTML = `${renderSidebar('usuarios','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Usuarios','Nuevo']})}${userFormContent('tablet')}</div>`;
-document.getElementById('m-user').innerHTML = `<div class="main-area">${renderTopbar({title:'Nuevo usuario', actions:`<button class="topbar__icon-btn">${Icons.close}</button>`})}${userFormContent('mobile')}</div>`;
-
-document.getElementById('d-cat').innerHTML = `${renderSidebar('catalogos','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Catálogos','Estados Oportunidad']})}${catDetailContent('desktop')}</div>`;
-document.getElementById('t-cat').innerHTML = `${renderSidebar('catalogos','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Catálogos','Estados']})}${catDetailContent('tablet')}</div>`;
-document.getElementById('m-cat').innerHTML = `<div class="main-area">${renderTopbar({title:'Estados Opp', actions:`<button class="topbar__icon-btn">${Icons.plus}</button>`})}${catDetailContent('mobile')}</div>`;
-
-document.getElementById('d-aud').innerHTML = `${renderSidebar('auditoria','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Auditoría','Evento #4871']})}${auditDetailContent('desktop')}</div>`;
-document.getElementById('t-aud').innerHTML = `${renderSidebar('auditoria','admin')}<div class="main-area">${renderTopbar({breadcrumb:['Auditoría','#4871']})}${auditDetailContent('tablet')}</div>`;
-document.getElementById('m-aud').innerHTML = `<div class="main-area">${renderTopbar({title:'Evento #4871'})}${auditDetailContent('mobile')}</div>`;
 </script>
 </body>
 </html>

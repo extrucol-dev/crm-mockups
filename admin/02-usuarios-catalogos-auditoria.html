@@ -32,35 +32,10 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
-    <div style="margin-bottom: 20px;">
-      <div class="canvas-title">🛠️ ADMINISTRADOR — Usuarios, Catálogos y Auditoría</div>
-      <div class="canvas-subtitle">
-        Gestión de usuarios con roles, catálogos maestros y auditoría.
-        DB: <code style="background:#fff; padding: 2px 6px; border-radius:4px; border: 1px solid #e5e5e5;">CRM_USUARIO + CRM_AUDITORIA + catálogos</code>
-      </div>
-    </div>
-
-    <div class="canvas-section-title">👥 Vista 1 — Gestión de Usuarios</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-u"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-u"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-u"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">📚 Vista 2 — Hub de Catálogos</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-c"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-c"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-c"></div></div></div>
-    </div>
-
-    <div class="canvas-section-title">🔍 Vista 3 — Auditoría</div>
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d-a"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t-a"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m-a"></div></div></div>
+<div>
+  <div>
+    <div>
+      <div><div><div class="app-shell" id="d-u"></div></div></div>
     </div>
   </div>
 </div>
@@ -304,16 +279,6 @@ function auditoriaContent(bp) {
 }
 
 document.getElementById('d-u').innerHTML = `${renderSidebar('usuarios','admin')}<div class="main-area">${renderTopbar({title:'Usuarios'})}${usuariosContent('desktop')}</div>`;
-document.getElementById('t-u').innerHTML = `${renderSidebar('usuarios','admin')}<div class="main-area">${renderTopbar({title:'Usuarios'})}${usuariosContent('tablet')}</div>`;
-document.getElementById('m-u').innerHTML = `<div class="main-area">${renderTopbar({title:'Usuarios', actions:`<button class="topbar__icon-btn">${Icons.plus}</button>`})}${usuariosContent('mobile')}</div>`;
-
-document.getElementById('d-c').innerHTML = `${renderSidebar('catalogos','admin')}<div class="main-area">${renderTopbar({title:'Catálogos'})}${catalogosContent('desktop')}</div>`;
-document.getElementById('t-c').innerHTML = `${renderSidebar('catalogos','admin')}<div class="main-area">${renderTopbar({title:'Catálogos'})}${catalogosContent('tablet')}</div>`;
-document.getElementById('m-c').innerHTML = `<div class="main-area">${renderTopbar({title:'Catálogos'})}${catalogosContent('mobile')}</div>`;
-
-document.getElementById('d-a').innerHTML = `${renderSidebar('auditoria','admin')}<div class="main-area">${renderTopbar({title:'Auditoría'})}${auditoriaContent('desktop')}</div>`;
-document.getElementById('t-a').innerHTML = `${renderSidebar('auditoria','admin')}<div class="main-area">${renderTopbar({title:'Auditoría'})}${auditoriaContent('tablet')}</div>`;
-document.getElementById('m-a').innerHTML = `<div class="main-area">${renderTopbar({title:'Auditoría'})}${auditoriaContent('mobile')}</div>`;
 </script>
 </body>
 </html>

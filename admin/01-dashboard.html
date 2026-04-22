@@ -29,20 +29,13 @@
 </style>
 </head>
 <body>
-<div class="mockup-scroll">
-  <div class="mockup-scroll__inner">
+<div>
+  <div>
 
-    <div style="margin-bottom: 40px;">
-      <div class="canvas-title">🟦 ADMINISTRADOR — Dashboard del Sistema</div>
-      <div class="canvas-subtitle">
-        Panel de control general: salud del sistema, estadísticas globales, actividad reciente y accesos rápidos a administración.
-      </div>
-    </div>
 
-    <div class="breakpoints-row">
-      <div class="bp-col"><div class="artboard-label">Desktop · 1440</div><div class="artboard artboard--desktop"><div class="app-shell" id="d"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Tablet · 768</div><div class="artboard artboard--tablet"><div class="app-shell is-tablet" id="t"></div></div></div>
-      <div class="bp-col"><div class="artboard-label">Mobile · 375</div><div class="artboard artboard--mobile"><div class="app-shell is-mobile" id="m"></div></div></div>
+    <div>
+      <div>
+        <div><div class="app-shell" id="d"></div></div></div>
     </div>
   </div>
 </div>
@@ -211,8 +204,6 @@ function content(bp) {
 }
 
 document.getElementById('d').innerHTML = `${renderSidebar('dashboard','admin')}<div class="main-area">${renderTopbar({title:'Administración'})}${content('desktop')}</div>`;
-document.getElementById('t').innerHTML = `${renderSidebar('dashboard','admin')}<div class="main-area">${renderTopbar({title:'Admin'})}${content('tablet')}</div>`;
-document.getElementById('m').innerHTML = `<div class="main-area">${renderTopbar({title:'Admin', actions:`<button class="topbar__icon-btn">${Icons.bell}</button>`})}${content('mobile')}</div>`;
 </script>
 </body>
 </html>
